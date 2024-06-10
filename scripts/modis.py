@@ -6,6 +6,7 @@ import rasterio
 from rasterio.warp import Resampling
 import rioxarray as rxr
 import xarray as xr
+import math
 
 
 def extract_fire_mask(input_path: str, output_dir: str = "../data/modis/processing") -> tuple[xr.Dataset, list[datetime], str]:
@@ -153,3 +154,29 @@ def resize(input_path: str, output_dir: str = "../data/modis/processing") -> str
             dst.write(clipped_modis_resized)
 
     return output_full_path
+
+def get_tile(lat_geographic, lon_geographic) -> tuple[int, int, float, float]:
+    """
+    Get the tile index and pixel coordinates of a given geographic coordinate.
+
+    Parameters:
+    lat_geographic (float): The latitude of the geographic coordinate.
+    lon_geographic (float): The longitude of the geographic coordinate.
+    
+    Returns:
+    tuple[int, int, float, float]: A tuple containing the vertical tile index, horizontal tile index, line and sample pixel coordinates.
+    """
+    
+    if lat_geographic < -90 or lat_geographic > 90:
+        raise ValueError("lat_geographic should be in range of [-90, 90]")
+    if lon_geographic < -180 or lon_geographic > 180:
+        raise ValueError("lon_geographic should be in range of [-180, 180]")
+
+    lat_tile = lat_geographic
+    lon_tile = lon_geographic * math.cos(math.radians(lat_geographic))
+
+    vertical_tile = int((90 - lat_tile) / 10)
+    horizontal_tile = int((lon_tile + 180) / 10)
+    line = -(lat_tile - 90 + vertical_tile * 10) * 120 - 0.5
+    sample = (180 - horizontal_tile * 10 + lon_tile) * 120 - 0.5
+    return vertical_tile, horizontal_tile, round(line, 8), round(sample, 8)
