@@ -15,21 +15,30 @@ import xarray as xr
 import math
 
 
-def dataflow_modis(start_date, end_date, tiles, raw_dir, processing_dir, output_dir):
-    tiles = "h14v03"
-    product = "MOD14A1.061"
-    
+def dataflow(
+    start_date,
+    end_date,
+    tiles: str = "h14v03",
+    product: str = "MOD14A1.061",
+    raw_dir: str = "../data/modis/raw",
+    processing_dir: str = "../data/modis/processing",
+    output_dir: str = "../data/modis/final",
+):
     # Download data
-    download_modis(start_date, end_date, output_dir=raw_dir, tiles=tiles, product=product)
+    textfile_path = download_modis(
+        start_date, end_date, output_dir=raw_dir, tiles=tiles, product=product
+    )
 
-    # Get all file names 
+    # Get all file names
     textfile_name = f"listfile{product}.txt"
     raw_dir = os.path.join(raw_dir, tiles)
     textfile_path = os.path.join(raw_dir, textfile_name)
-    hdf_files  = get_modis_hdf_filelist(textfile_path)
+    hdf_files = get_modis_hdf_filelist(textfile_path)
 
-
-    return
+    fire_list = []
+    for file in hdf_files:
+        fire_list.append(extract_fire_mask(file, processing_dir))
+    return fire_list
 
 
 def get_modis_hdf_filelist(textfile_path: str):
@@ -41,19 +50,25 @@ def get_modis_hdf_filelist(textfile_path: str):
             if line.endswith(".hdf"):
                 hdf_files.append(os.path.join(dir, line))
     return hdf_files
-    
 
-def download_modis(start_date, end_date, output_dir:str = "../data/modis/raw", tiles:str = "h14v03", path:str = "MOLT", product:str = "MOD14A1.061"):
-    """ Fetches all the modis files between specific dates
-    """
-    full_path = os.path.join(output_dir,tiles)
+
+def download_modis(
+    start_date,
+    end_date,
+    output_dir: str = "../data/modis/raw",
+    tiles: str = "h14v03",
+    path: str = "MOLT",
+    product: str = "MOD14A1.061",
+):
+    """Fetches all the modis files between specific dates"""
+    full_path = os.path.join(output_dir, tiles)
 
     textfile_name = f"listfile{product}.txt"
     final_output_dir = os.path.join(output_dir, tiles)
     textfile_path = os.path.join(final_output_dir, textfile_name)
-    if os.path.exists(full_path):
+    if os.path.exists(textfile_path):
         return textfile_path
-    
+
     # Create directory for our data
     os.mkdir(full_path)
 
@@ -62,7 +77,6 @@ def download_modis(start_date, end_date, output_dir:str = "../data/modis/raw", t
         credentials = yaml.safe_load(file)
     user = credentials["modis"]["API_USER"]
     password = credentials["modis"]["API_PASSWORD"]
-    
 
     # Setup API call
     downloader = pymodis.downmodis.downModis(
@@ -78,12 +92,20 @@ def download_modis(start_date, end_date, output_dir:str = "../data/modis/raw", t
 
     # Call
     downloader.connect()
+    # Fetch credentials for modis
+    with open("../config.yaml") as file:
+        credentials = yaml.safe_load(file)
+    user = credentials["modis"]["API_USER"]
+    password = credentials["modis"]["API_PASSWORD"]
     downloader.downloadsAllDay(allDays=False)
     return textfile_path
 
-def extract_fire_mask(input_path: str, output_dir: str = "../data/modis/processing") -> tuple[xr.Dataset, list[datetime], str]:
+
+def extract_fire_mask(
+    input_path: str, output_dir: str = "../data/modis/processing"
+) -> tuple[xr.Dataset, list[datetime], str]:
     """
-    Extracts the fire mask from a MODIS HDF file, reprojects it to EPSG:4326, 
+    Extracts the fire mask from a MODIS HDF file, reprojects it to EPSG:4326,
     and saves it as a GeoTIFF file. Also extracts the dates from the file attributes.
 
     Parameters:
@@ -93,29 +115,34 @@ def extract_fire_mask(input_path: str, output_dir: str = "../data/modis/processi
     Returns:
     tuple[xr.Dataset, list[datetime], str]: The reprojected fire mask dataset, list of dates and the full path to the processed file.
     """
+    # check if the file already exists
+    output_filename = os.path.basename(input_path)[:-3] + "fire.tif"
+    output_full_path = os.path.join(output_dir, output_filename)
+    if os.path.exists(output_full_path):
+        return output_full_path
+
     # Retrieve data
     dataset = rxr.open_rasterio(input_path, masked=True)
 
     # Reproject
     dataset = dataset.rio.reproject("EPSG:4326")
 
+    # TODO: remove if not needed with new weather functions
     # Extracts dates
-    dates = dataset.attrs["DAYSOFYEAR"]
-    dates = dates.split(", ")
-    date_objects = [datetime.strptime(date_str, "%Y-%m-%d") for date_str in dates]
-    
+    # dates = dataset.attrs["DAYSOFYEAR"]
+    # dates = dates.split(", ")
+    # date_objects = [datetime.strptime(date_str, "%Y-%m-%d") for date_str in dates]
+
     dataset.FireMask.rio.write_nodata(0, inplace=True)
     dataset = dataset.FireMask.rio.reproject("EPSG:4326")
 
-    # Save the new file to tiff
-    output_filename = os.path.basename(input_path)[:-3] + "fire.tif"
-    output_full_path = os.path.join(output_dir, output_filename)
     dataset.rio.to_raster(output_full_path)
+    return output_full_path
 
-    return date_objects, output_full_path
 
-
-def get_coords_and_pixels(dataset: rasterio.io.DatasetReader) -> tuple[list[tuple[float, float]], list[tuple[int, int]]]:
+def get_coords_and_pixels(
+    dataset: rasterio.io.DatasetReader,
+) -> tuple[list[tuple[float, float]], list[tuple[int, int]]]:
     """
     Extracts the coordinates and pixels with high fire confidence from a fire band.
 
@@ -129,18 +156,22 @@ def get_coords_and_pixels(dataset: rasterio.io.DatasetReader) -> tuple[list[tupl
     """
     # Read the first band of the dataset
     fire_band = dataset.read(1)
-    
+
     # Get the indices of pixels with high fire confidence
     high_confidence_indices = np.argwhere(fire_band > 6)
-    
+
     # Extract the coordinates and pixel indices
     coords = [dataset.xy(row, col) for row, col in high_confidence_indices]
     pixels = [tuple(idx) for idx in high_confidence_indices]
-    
+
     return coords, pixels
 
 
-def crop(input_path: str, bbox_coords: tuple[float, float, float, float], output_dir: str = "../data/modis/processing") -> str:
+def crop(
+    input_path: str,
+    bbox_coords: tuple[float, float, float, float],
+    output_dir: str = "../data/modis/processing",
+) -> str:
     """
     Saves a cropped version of a MODIS image based on bounding box coordinates.
 
@@ -154,6 +185,12 @@ def crop(input_path: str, bbox_coords: tuple[float, float, float, float], output
     """
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
+
+    # Save the new file to tiff
+    output_filename = os.path.basename(input_path).replace(".tif", ".cropped.tif")
+    output_full_path = os.path.join(output_dir, output_filename)
+    if os.path.exists(output_full_path):
+        return output_full_path
 
     # Open the MODIS image
     with rasterio.open(input_path) as src:
@@ -174,16 +211,12 @@ def crop(input_path: str, bbox_coords: tuple[float, float, float, float], output
             }
         )
 
-        # Save the new file to tiff
-        output_filename = os.path.basename(input_path).replace('.tif', '_cropped.tif')
-        output_full_path = os.path.join(output_dir, output_filename)
-
         with rasterio.open(output_full_path, "w", **profile) as dst:
             dst.write(modis_data)
 
     return output_full_path
-    
-    
+
+
 def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     """
     Resizes a clipped MODIS image to a new width and height.
@@ -198,6 +231,12 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
+    # Save the new file to tiff
+    output_filename = os.path.basename(input_path).replace(".tif", ".cropped.tif")
+    output_full_path = os.path.join(output_dir, output_filename)
+    if os.path.exists(output_full_path):
+        return output_full_path
+
     # Open the clipped MODIS image
     with rasterio.open(input_path) as src:
         # Define new width and height
@@ -205,21 +244,14 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
 
         # Resize the image
         clipped_modis_resized = src.read(
-            out_shape=(src.count, new_height, new_width),
-            resampling=Resampling.bilinear
+            out_shape=(src.count, new_height, new_width), resampling=Resampling.bilinear
         )
 
         # Get the profile of the resized MODIS data
         profile = src.profile.copy()
-        profile.update({
-            "height": new_height,
-            "width": new_width,
-            "transform": src.transform
-        })
-
-        # Save the new file to tiff
-        output_filename = os.path.basename(input_path).replace('.tif', '_resized.tif')
-        output_full_path = os.path.join(output_dir, output_filename)
+        profile.update(
+            {"height": new_height, "width": new_width, "transform": src.transform}
+        )
 
         # Write the resized MODIS data to a new GeoTIFF file
         with rasterio.open(output_full_path, "w", **profile) as dst:
@@ -228,18 +260,20 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     return output_full_path
 
 
-def get_tile(lat_geographic: float, lon_geographic: float) -> tuple[int, int, float, float]:
+def get_tile(
+    lat_geographic: float, lon_geographic: float
+) -> tuple[int, int, float, float]:
     """
     Get the tile index and pixel coordinates of a given geographic coordinate.
 
     Parameters:
     lat_geographic (float): The latitude of the geographic coordinate.
     lon_geographic (float): The longitude of the geographic coordinate.
-    
+
     Returns:
     tuple[int, int, float, float]: A tuple containing the vertical tile index, horizontal tile index, line and sample pixel coordinates.
     """
-    
+
     if lat_geographic < -90 or lat_geographic > 90:
         raise ValueError("lat_geographic should be in range of [-90, 90]")
     if lon_geographic < -180 or lon_geographic > 180:
@@ -263,8 +297,10 @@ def get_weather(input_path: str, date_objects):
     tiff_file = rxr.open_rasterio(input_path)
 
     # Initialize the dictionary to store masks
-    mask_types = ['tavg', 'prcp', 'wdir', 'wspd']
-    masks = {mask_type: np.zeros_like(tiff_file, dtype=float) for mask_type in mask_types}
+    mask_types = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"]
+    masks = {
+        mask_type: np.zeros_like(tiff_file, dtype=float) for mask_type in mask_types
+    }
 
     # Open the input raster dataset
     dataset = rasterio.open(input_path)
@@ -286,6 +322,13 @@ def get_weather(input_path: str, date_objects):
                 # If data is not empty, assign values to the mask arrays
                 if not data.empty:
                     for mask_type in mask_types:
+                        cossin_data = np.radians(data)
+                        # add circular encoding to wind direction
+                        if mask_type == "sin_wdir":
+                            masks["sin_wdir"][k, i, j] = np.sin(cossin_data)
+                        if mask_type == "cos_wdir":
+                            masks["cos_wdir"][k, i, j] = np.cos(cossin_data)
+
                         masks[mask_type][k, i, j] = data[mask_type]
                 else:
                     for mask_type in mask_types:
