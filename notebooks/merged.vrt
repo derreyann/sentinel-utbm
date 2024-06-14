@@ -1,0 +1,573 @@
+<VRTDataset rasterXSize="2585" rasterYSize="2063">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.2559529576077338e+02,  4.3729600983770820e-03,  0.0000000000000000e+00,  5.4190559224021314e+01,  0.0000000000000000e+00, -2.6684402861275034e-03</GeoTransform>
+  <VRTRasterBand dataType="Byte" band="1">
+    <ColorInterp>Gray</ColorInterp>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_0.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1550.3870563954" yOff="24.0152782846764" xSize="518.556738633168" ySize="506.058241451404" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_1.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="501.887595942436" yOff="1028.40762679239" xSize="488.215648442554" ySize="505.981024570886" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_10.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1033.85101228938" yOff="16.0163855593723" xSize="518.818121939074" ySize="506.058848918796" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_11.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="22.297139833027" yOff="1529.12356254666" xSize="474.748224052071" ySize="505.941961836565" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_12.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="495.185087957648" yOff="1536.05154722151" xSize="474.568872820705" ySize="505.941419308575" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_13.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1912.78453808181" yOff="1556.80857679128" xSize="474.03261902919" ySize="505.939793532628" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_14.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="517.055505154778" yOff="8.01129647707552" xSize="519.080043060315" ySize="506.059456723828" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_15.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="15.4619103331835" yOff="1021.1407969774" xSize="488.418683051755" ySize="505.98158911639" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_16.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1959.95963155725" yOff="1050.17824093918" xSize="487.608719289379" ySize="505.979332815611" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_17.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="988.112204851873" yOff="1035.66947237623" xSize="488.012976941218" ySize="505.980460339034" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_18.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2066.66417075713" yOff="32.0079856566215" xSize="518.295891428949" ySize="506.057634321478" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_19.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1010.03011523307" yOff="526.72149619699" xSize="502.777439433232" ySize="506.019812382113" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_2.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1474.1360970545" yOff="1042.92634125606" xSize="487.810667553605" ySize="505.979896420669" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_3.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1510.6770416924" yOff="534.337457448021" xSize="502.547840113426" ySize="506.019226600774" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_4.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="509.155337920126" yOff="519.099992876315" xSize="503.007478695597" ySize="506.020398489068" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_5.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="967.895438574976" yOff="1542.97504030692" xSize="474.38982208267" ySize="505.940877082036" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_6.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2011.09655350233" yOff="541.947885688467" xSize="502.318679439177" ySize="506.01864114487" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_7.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1440.42848957322" yOff="1549.89404807719" xSize="474.21107107294" ySize="505.940335156775" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_8.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="8.05227225763415" yOff="511.472938401036" xSize="503.237959202854" ySize="506.020984921815" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_9.tiff</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="0" yOff="0" xSize="519.342503718122" ySize="506.060064866686" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="2">
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_0.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1550.3870563954" yOff="24.0152782846764" xSize="518.556738633168" ySize="506.058241451404" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_1.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="501.887595942436" yOff="1028.40762679239" xSize="488.215648442554" ySize="505.981024570886" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_10.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1033.85101228938" yOff="16.0163855593723" xSize="518.818121939074" ySize="506.058848918796" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_11.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="22.297139833027" yOff="1529.12356254666" xSize="474.748224052071" ySize="505.941961836565" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_12.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="495.185087957648" yOff="1536.05154722151" xSize="474.568872820705" ySize="505.941419308575" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_13.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1912.78453808181" yOff="1556.80857679128" xSize="474.03261902919" ySize="505.939793532628" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_14.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="517.055505154778" yOff="8.01129647707552" xSize="519.080043060315" ySize="506.059456723828" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_15.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="15.4619103331835" yOff="1021.1407969774" xSize="488.418683051755" ySize="505.98158911639" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_16.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1959.95963155725" yOff="1050.17824093918" xSize="487.608719289379" ySize="505.979332815611" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_17.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="988.112204851873" yOff="1035.66947237623" xSize="488.012976941218" ySize="505.980460339034" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_18.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2066.66417075713" yOff="32.0079856566215" xSize="518.295891428949" ySize="506.057634321478" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_19.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1010.03011523307" yOff="526.72149619699" xSize="502.777439433232" ySize="506.019812382113" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_2.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1474.1360970545" yOff="1042.92634125606" xSize="487.810667553605" ySize="505.979896420669" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_3.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1510.6770416924" yOff="534.337457448021" xSize="502.547840113426" ySize="506.019226600774" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_4.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="509.155337920126" yOff="519.099992876315" xSize="503.007478695597" ySize="506.020398489068" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_5.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="967.895438574976" yOff="1542.97504030692" xSize="474.38982208267" ySize="505.940877082036" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_6.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2011.09655350233" yOff="541.947885688467" xSize="502.318679439177" ySize="506.01864114487" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_7.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1440.42848957322" yOff="1549.89404807719" xSize="474.21107107294" ySize="505.940335156775" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_8.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="8.05227225763415" yOff="511.472938401036" xSize="503.237959202854" ySize="506.020984921815" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_9.tiff</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="0" yOff="0" xSize="519.342503718122" ySize="506.060064866686" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="3">
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_0.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1550.3870563954" yOff="24.0152782846764" xSize="518.556738633168" ySize="506.058241451404" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_1.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="501.887595942436" yOff="1028.40762679239" xSize="488.215648442554" ySize="505.981024570886" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_10.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1033.85101228938" yOff="16.0163855593723" xSize="518.818121939074" ySize="506.058848918796" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_11.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="22.297139833027" yOff="1529.12356254666" xSize="474.748224052071" ySize="505.941961836565" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_12.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="495.185087957648" yOff="1536.05154722151" xSize="474.568872820705" ySize="505.941419308575" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_13.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1912.78453808181" yOff="1556.80857679128" xSize="474.03261902919" ySize="505.939793532628" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_14.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="517.055505154778" yOff="8.01129647707552" xSize="519.080043060315" ySize="506.059456723828" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_15.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="15.4619103331835" yOff="1021.1407969774" xSize="488.418683051755" ySize="505.98158911639" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_16.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1959.95963155725" yOff="1050.17824093918" xSize="487.608719289379" ySize="505.979332815611" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_17.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="988.112204851873" yOff="1035.66947237623" xSize="488.012976941218" ySize="505.980460339034" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_18.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2066.66417075713" yOff="32.0079856566215" xSize="518.295891428949" ySize="506.057634321478" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_19.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1010.03011523307" yOff="526.72149619699" xSize="502.777439433232" ySize="506.019812382113" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_2.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1474.1360970545" yOff="1042.92634125606" xSize="487.810667553605" ySize="505.979896420669" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_3.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1510.6770416924" yOff="534.337457448021" xSize="502.547840113426" ySize="506.019226600774" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_4.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="509.155337920126" yOff="519.099992876315" xSize="503.007478695597" ySize="506.020398489068" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_5.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="967.895438574976" yOff="1542.97504030692" xSize="474.38982208267" ySize="505.940877082036" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_6.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2011.09655350233" yOff="541.947885688467" xSize="502.318679439177" ySize="506.01864114487" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_7.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1440.42848957322" yOff="1549.89404807719" xSize="474.21107107294" ySize="505.940335156775" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_8.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="8.05227225763415" yOff="511.472938401036" xSize="503.237959202854" ySize="506.020984921815" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_9.tiff</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="0" yOff="0" xSize="519.342503718122" ySize="506.060064866686" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="4">
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_0.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1550.3870563954" yOff="24.0152782846764" xSize="518.556738633168" ySize="506.058241451404" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_1.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="501.887595942436" yOff="1028.40762679239" xSize="488.215648442554" ySize="505.981024570886" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_10.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1033.85101228938" yOff="16.0163855593723" xSize="518.818121939074" ySize="506.058848918796" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_11.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="22.297139833027" yOff="1529.12356254666" xSize="474.748224052071" ySize="505.941961836565" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_12.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="495.185087957648" yOff="1536.05154722151" xSize="474.568872820705" ySize="505.941419308575" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_13.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1912.78453808181" yOff="1556.80857679128" xSize="474.03261902919" ySize="505.939793532628" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_14.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="517.055505154778" yOff="8.01129647707552" xSize="519.080043060315" ySize="506.059456723828" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_15.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="15.4619103331835" yOff="1021.1407969774" xSize="488.418683051755" ySize="505.98158911639" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_16.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1959.95963155725" yOff="1050.17824093918" xSize="487.608719289379" ySize="505.979332815611" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_17.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="988.112204851873" yOff="1035.66947237623" xSize="488.012976941218" ySize="505.980460339034" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_18.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2066.66417075713" yOff="32.0079856566215" xSize="518.295891428949" ySize="506.057634321478" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_19.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1010.03011523307" yOff="526.72149619699" xSize="502.777439433232" ySize="506.019812382113" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_2.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1474.1360970545" yOff="1042.92634125606" xSize="487.810667553605" ySize="505.979896420669" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_3.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1510.6770416924" yOff="534.337457448021" xSize="502.547840113426" ySize="506.019226600774" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_4.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="509.155337920126" yOff="519.099992876315" xSize="503.007478695597" ySize="506.020398489068" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_5.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="967.895438574976" yOff="1542.97504030692" xSize="474.38982208267" ySize="505.940877082036" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_6.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="2011.09655350233" yOff="541.947885688467" xSize="502.318679439177" ySize="506.01864114487" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_7.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="1440.42848957322" yOff="1549.89404807719" xSize="474.21107107294" ySize="505.940335156775" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_8.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="8.05227225763415" yOff="511.472938401036" xSize="503.237959202854" ySize="506.020984921815" />
+    </SimpleSource>
+    <SimpleSource resampling="nearest">
+      <SourceFilename relativeToVRT="1">../data/sentinel/tiff\image_9.tiff</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="496" RasterYSize="506" DataType="Byte" BlockXSize="496" BlockYSize="8" />
+      <SrcRect xOff="0" yOff="0" xSize="496" ySize="506" />
+      <DstRect xOff="0" yOff="0" xSize="519.342503718122" ySize="506.060064866686" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>
