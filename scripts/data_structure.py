@@ -4,8 +4,11 @@ from dataclasses import dataclass
 from typing import Union, Tuple, Annotated
 from annotated_types import Len
 
+# Tuple like (50.4,-120.5) to store coordinates
 GPSCoord = Tuple[confloat(ge=-90, le=90), confloat(ge=-180, le=180)]
+# A list of four coordinates create a bounding box
 BoundingBox = Annotated[list[GPSCoord], Len(4)]
+
 
 @dataclass
 class Event(BaseModel):
@@ -15,20 +18,36 @@ class Event(BaseModel):
 
     @field_validator("end_date")
     def check_date_order(cls, v: datetime.date, info: ValidationInfo) -> datetime.date:
+        """Validates that the end_date is not before the start_date"""
         if "start_date" in info.data and v < info.data["start_date"]:
-            raise ValueError('End date must be after start date.')
+            raise ValueError("End date must be after start date.")
         return v
-    
-    @field_validator('location')
+
+    @field_validator("location")
     def check_location(cls, location):
+        """Validates that the location is either a GPSCoord or a BoundingBox"""
         if isinstance(location, tuple) and len(location) == 2:
             return location
         elif isinstance(location, list) and len(location) == 4:
             return location
         else:
-            raise ValueError("Invalid location. Must be a GPS coordinate (latitude, longitude) or a bounding box (list of 4 GPS coordinates).")
-        
-    def __init__(self, start_date: datetime.date, end_date: datetime.date, location: Union[GPSCoord, BoundingBox]):
-        super().__init__(start_date = start_date, end_date = end_date, location = location)
+            raise ValueError(
+                "Invalid location. Must be a GPS coordinate (latitude, longitude) or a bounding box (list of 4 GPS coordinates)."
+            )
 
+    def __init__(
+        self,
+        start_date: datetime.date,
+        end_date: datetime.date,
+        location: Union[GPSCoord, BoundingBox],
+    ):
+        super().__init__(start_date=start_date, end_date=end_date, location=location)
 
+    def get_modis_data(self):
+        return
+
+    def get_weather_data(self):
+        return
+
+    def get_sentinel_data(self):
+        return
