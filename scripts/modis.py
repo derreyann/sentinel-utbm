@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 import os
 import warnings
 
+
 import numpy as np
-from meteostat import Daily, Point
 import pandas as pd
 import pymodis
 import rasterio
@@ -13,6 +13,9 @@ import tqdm
 import yaml
 import xarray as xr
 import math
+
+
+from utils import create_bounding_box
 
 
 def dataflow(
@@ -35,10 +38,18 @@ def dataflow(
     textfile_path = os.path.join(raw_dir, textfile_name)
     hdf_files = get_modis_hdf_filelist(textfile_path)
 
-    fire_list = []
+    final_array = []
     for file in hdf_files:
-        fire_list.append(extract_fire_mask(file, processing_dir))
-    return fire_list
+        fire_file, dates = extract_fire_mask(file, processing_dir)
+        start_date = dates[0]
+        end_dates  = dates[-1]
+        coords, _ = get_coords_and_pixels(fire_file)
+        if not coords:
+            continue
+        bbox_coords = create_bounding_box(coords)
+        cropped = crop(fire_file, bbox_coords, processing_dir)
+        final_array.append((resize(cropped, output_dir), start_date, end_dates))
+    return final_array
 
 
 def get_modis_hdf_filelist(textfile_path: str):
@@ -115,53 +126,60 @@ def extract_fire_mask(
     Returns:
     tuple[xr.Dataset, list[datetime], str]: The reprojected fire mask dataset, list of dates and the full path to the processed file.
     """
+    dataset = rxr.open_rasterio(input_path, masked=True)
+    # TODO: remove if not needed with new weather functions
+    # Extracts dates
+    dates = dataset.attrs["DAYSOFYEAR"]
+    dates = dates.split(", ")
+    date_objects = [datetime.strptime(date_str, "%Y-%m-%d") for date_str in dates]
+
     # check if the file already exists
     output_filename = os.path.basename(input_path)[:-3] + "fire.tif"
     output_full_path = os.path.join(output_dir, output_filename)
     if os.path.exists(output_full_path):
-        return output_full_path
+        return output_full_path, date_objects
 
     # Retrieve data
-    dataset = rxr.open_rasterio(input_path, masked=True)
+    
 
     # Reproject
     dataset = dataset.rio.reproject("EPSG:4326")
 
-    # TODO: remove if not needed with new weather functions
-    # Extracts dates
-    # dates = dataset.attrs["DAYSOFYEAR"]
-    # dates = dates.split(", ")
-    # date_objects = [datetime.strptime(date_str, "%Y-%m-%d") for date_str in dates]
+
 
     dataset.FireMask.rio.write_nodata(0, inplace=True)
     dataset = dataset.FireMask.rio.reproject("EPSG:4326")
 
     dataset.rio.to_raster(output_full_path)
-    return output_full_path
+    return output_full_path, date_objects
 
 
 def get_coords_and_pixels(
-    dataset: rasterio.io.DatasetReader,
+    fire_filename: str,
 ) -> tuple[list[tuple[float, float]], list[tuple[int, int]]]:
     """
     Extracts the coordinates and pixels with high fire confidence from a fire band.
 
     Parameters:
-    dataset (rasterio.io.DatasetReadert): The input rasterio dataset.
+    fire_filename: The input rasterio dataset with the Modis fire band.
 
     Returns:
     Tuple[List[Tuple[float, float]], List[Tuple[int, int]]]: A tuple containing two lists:
         - List of coordinates (longitude, latitude) of high fire confidence pixels.
         - List of pixel indices (row, column) of high fire confidence pixels.
     """
+    fire = rasterio.open(fire_filename)
+
     # Read the first band of the dataset
-    fire_band = dataset.read(1)
+    fire_band = fire.read(1)
 
     # Get the indices of pixels with high fire confidence
     high_confidence_indices = np.argwhere(fire_band > 6)
+    if not high_confidence_indices.any():
+        return None, None
 
     # Extract the coordinates and pixel indices
-    coords = [dataset.xy(row, col) for row, col in high_confidence_indices]
+    coords = [fire.xy(row, col) for row, col in high_confidence_indices]
     pixels = [tuple(idx) for idx in high_confidence_indices]
 
     return coords, pixels
@@ -232,7 +250,7 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     os.makedirs(output_dir, exist_ok=True)
 
     # Save the new file to tiff
-    output_filename = os.path.basename(input_path).replace(".tif", ".cropped.tif")
+    output_filename = os.path.basename(input_path).replace(".tif", ".resized.tif")
     output_full_path = os.path.join(output_dir, output_filename)
     if os.path.exists(output_full_path):
         return output_full_path
@@ -288,63 +306,3 @@ def get_tile(
     sample = (180 - horizontal_tile * 10 + lon_tile) * 120 - 0.5
     tile = f"h{0:02}v{1:02}".format(vertical_tile, horizontal_tile)
     return tile
-
-
-def get_weather(input_path: str, date_objects):
-    warnings.filterwarnings("ignore", category=FutureWarning)
-
-    # Open the resized MODIS image
-    tiff_file = rxr.open_rasterio(input_path)
-
-    # Initialize the dictionary to store masks
-    mask_types = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"]
-    masks = {
-        mask_type: np.zeros_like(tiff_file, dtype=float) for mask_type in mask_types
-    }
-
-    # Open the input raster dataset
-    dataset = rasterio.open(input_path)
-    profile = dataset.profile.copy()
-
-    # TODO: Vectorize operations
-    for k, date in enumerate(date_objects):
-        print(f"Processing data for date: {date}")
-
-        for i in tqdm.tqdm(range(dataset.read(k + 1).shape[0])):
-            for j in range(dataset.read(k + 1).shape[1]):
-                point = Point(j, i)
-
-                # Get daily data
-                data = Daily(point, date, date)
-                data = data.interpolate()
-                data = data.fetch()
-
-                # If data is not empty, assign values to the mask arrays
-                if not data.empty:
-                    for mask_type in mask_types:
-                        cossin_data = np.radians(data)
-                        # add circular encoding to wind direction
-                        if mask_type == "sin_wdir":
-                            masks["sin_wdir"][k, i, j] = np.sin(cossin_data)
-                        if mask_type == "cos_wdir":
-                            masks["cos_wdir"][k, i, j] = np.cos(cossin_data)
-
-                        masks[mask_type][k, i, j] = data[mask_type]
-                else:
-                    for mask_type in mask_types:
-                        masks[mask_type][k, i, j] = np.nan
-
-    save_weather(masks, profile)
-    return masks
-
-
-def save_weather(data: dict, profile, output_dir: str = "../data/modis/final"):
-    profile.update(
-        {
-            "dtype": "float64",
-        }
-    )
-    for key in data.keys():
-        path = os.path.join(output_dir, key)
-        with rasterio.open(path, "w", **profile) as dst:
-            dst.write(data[key])
