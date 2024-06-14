@@ -2,5 +2,5 @@ modis:
   API_USER: your_api_user
   API_PASSWORD: your_api_password
 sentinelhub:
-  API_USER: your_api_user
-  API_PASSWORD: your_api_password
+  API_USER: 788c009d-6560-48ca-8ac1-edffaf6c9c8c
+  API_PASSWORD: BZYr0WmszDJCGcU8IjX2mvLAVyEJyBvc
