@@ -153,7 +153,7 @@ def get_ndvi_img(aoi_bbox,aoi_size, data_folder, start_date, end_date,evalscript
       input_data=[
           SentinelHubRequest.input_data(
               data_collection=DataCollection.SENTINEL2_L2A,
-              time_interval=("2021-07-15", "2021-08-15"),
+              time_interval=(start_date, end_date),
               other_args={"dataFilter": {"mosaickingOrder": "leastCC"}},
           )
       ],
@@ -228,7 +228,7 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
 
     # Load the last merged image
     merged_image = cv2.imread(output_file, cv2.IMREAD_UNCHANGED)
-    
+
     # Function to plot the image
     def plot_image(image, factor=1):
         plt.imshow(image * factor, cmap='gray')
@@ -237,4 +237,3 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
 
     # Display the merged image
     plot_image(merged_image, factor=1 / 255)
-
