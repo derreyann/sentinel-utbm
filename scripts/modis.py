@@ -21,12 +21,19 @@ from utils import create_bounding_box
 def dataflow(
     start_date,
     end_date,
+    lat: float,
+    lon: float,
     tiles: str = "h14v03",
     product: str = "MOD14A1.061",
     raw_dir: str = "../data/modis/raw",
     processing_dir: str = "../data/modis/processing",
     output_dir: str = "../data/modis/final",
 ):
+    if not tiles and (not lat or not lon):
+        raise ValueError("Either the tile name or the latitude and longitude needs to be set")
+    if not tiles:
+        tiles = get_tile(lat, lon)
+
     # Download data
     textfile_path = download_modis(
         start_date, end_date, output_dir=raw_dir, tiles=tiles, product=product
@@ -38,18 +45,13 @@ def dataflow(
     textfile_path = os.path.join(raw_dir, textfile_name)
     hdf_files = get_modis_hdf_filelist(textfile_path)
 
+    fire_files, start_date, end_date, bbox_coords = get_event_dimensions(hdf_files, processing_dir)
+    
     final_array = []
-    for file in hdf_files:
-        fire_file, dates = extract_fire_mask(file, processing_dir)
-        start_date = dates[0]
-        end_dates  = dates[-1]
-        coords, _ = get_coords_and_pixels(fire_file)
-        if not coords:
-            continue
-        bbox_coords = create_bounding_box(coords)
-        cropped = crop(fire_file, bbox_coords, processing_dir)
-        final_array.append((resize(cropped, output_dir), start_date, end_dates))
-    return final_array
+    for file in fire_files:
+        cropped = crop(file, bbox_coords, processing_dir)
+        final_array.append(resize(cropped, output_dir))
+    return final_array, start_date, end_date, bbox_coords
 
 
 def get_modis_hdf_filelist(textfile_path: str):
@@ -61,6 +63,38 @@ def get_modis_hdf_filelist(textfile_path: str):
             if line.endswith(".hdf"):
                 hdf_files.append(os.path.join(dir, line))
     return hdf_files
+
+
+def get_event_dimensions(hdf_files, processing_dir):
+    """ This functions extracts the spatial and time dimension out of an event"""
+    fire_files = []
+    coordinates_array = []
+    date_array = []
+    # Extract coordinates out of the first detected fire event
+    for file in hdf_files:
+        fire_file, dates = extract_fire_mask(file, processing_dir)
+        coords, _ = get_coords_and_pixels(fire_file)
+
+        if not coords:
+            # If we don't find fire pixel and have no previous events, continue
+            if not coordinates_array:
+                continue
+            # If we already have coordinates and no new events, break
+            else:
+                break
+
+        coordinates_array += coords
+        date_array.append([dates[0], dates[-1]])
+        fire_files.append(fire_file)
+
+    if not fire_files:
+        raise ValueError("No fire founds")
+    
+    # Extract the first and last date out of that array
+    start_date = date_array[ 0][0]
+    end_date   = date_array[-1][1]
+    bbox_coords = create_bounding_box(coordinates_array)
+    return fire_files, start_date, end_date, bbox_coords
 
 
 def download_modis(
