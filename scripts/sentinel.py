@@ -60,17 +60,24 @@ def generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km):
         line_points = []
 
         while current_lon <= lon_max:
+            # Check if the next point will be outside the bbox
+            next_lat, next_lon = move_coords(current_lon, current_lat, spacing_km, 90)
             line_points.append((current_lat, current_lon))
             points_in_line += 1
-            current_lat, current_lon = move_coords(current_lon, current_lat, spacing_km, 90)
+            current_lat, current_lon = next_lat, next_lon
+        
+        # Check if the next point will be outside the bbox
+        next_lat, next_lon = move_coords(current_lon, current_lat, spacing_km, 90)
+        line_points.append((current_lat, current_lon))
+        points_in_line += 1
+        current_lat, current_lon = next_lat, next_lon
         
         points.extend(line_points)
         points_per_line.append(points_in_line)
         max_points_in_line = max(max_points_in_line, points_in_line)
         
-        current_lat, current_lon = move_coords(lon_min, current_lat, spacing_km-10, 180)
-
-        current_lon = lon_min
+        # Move to the next line, shifting current_lon to make the next line start further away
+        current_lat, current_lon = move_coords(lon_min, current_lat, spacing_km - 10, 180)
 
     return points, max_points_in_line, num_lines, points_per_line
 
