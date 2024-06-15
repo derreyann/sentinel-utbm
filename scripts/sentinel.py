@@ -10,6 +10,7 @@ from sentinelhub import SentinelHubRequest, DataCollection, MimeType
 import math
 import numpy as np
 
+
 def move_coords(longitude, latitude, dist, dir):
     """
     Move the coordinates by a given distance in a given direction.
@@ -30,6 +31,7 @@ def move_coords(longitude, latitude, dist, dir):
     new_longitude = new_point.longitude
     return new_latitude, new_longitude
 
+
 def generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km):
     """
     Generate a grid of points within a given bounding box.
@@ -44,11 +46,11 @@ def generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km):
     Returns:
     tuple: A tuple containing a list of points, the maximum number of points in a line, the number of lines, and a list of the number of points per line.
     """
-        
+
     points = []
     num_lines = 0
     max_points_in_line = 0
-    points_per_line = [] 
+    points_per_line = []
 
     # Initial coordinates
     current_lat = lat_max
@@ -65,41 +67,49 @@ def generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km):
             line_points.append((current_lat, current_lon))
             points_in_line += 1
             current_lat, current_lon = next_lat, next_lon
-        
+
         # Check if the next point will be outside the bbox
         next_lat, next_lon = move_coords(current_lon, current_lat, spacing_km, 90)
         line_points.append((current_lat, current_lon))
         points_in_line += 1
         current_lat, current_lon = next_lat, next_lon
-        
+
         points.extend(line_points)
         points_per_line.append(points_in_line)
         max_points_in_line = max(max_points_in_line, points_in_line)
-        
+
         # Move to the next line, shifting current_lon to make the next line start further away
-        current_lat, current_lon = move_coords(lon_min, current_lat, spacing_km - 10, 180)
+        current_lat, current_lon = move_coords(
+            lon_min, current_lat, spacing_km - 10, 180
+        )
 
     return points, max_points_in_line, num_lines, points_per_line
 
+
 # degrees to radians
 def deg2rad(degrees):
-    return math.pi*degrees/180.0
+    return math.pi * degrees / 180.0
+
+
 # radians to degrees
 def rad2deg(radians):
-    return 180.0*radians/math.pi
+    return 180.0 * radians / math.pi
+
 
 # Semi-axes of WGS-84 geoidal reference
 WGS84_a = 6378137.0  # Major semiaxis [m]
 WGS84_b = 6356752.3  # Minor semiaxis [m]
 
+
 # Earth radius at a given latitude, according to the WGS-84 ellipsoid [m]
 def WGS84EarthRadius(lat):
     # http://en.wikipedia.org/wiki/Earth_radius
-    An = WGS84_a*WGS84_a * math.cos(lat)
-    Bn = WGS84_b*WGS84_b * math.sin(lat)
+    An = WGS84_a * WGS84_a * math.cos(lat)
+    Bn = WGS84_b * WGS84_b * math.sin(lat)
     Ad = WGS84_a * math.cos(lat)
     Bd = WGS84_b * math.sin(lat)
-    return math.sqrt( (An*An + Bn*Bn)/(Ad*Ad + Bd*Bd) )
+    return math.sqrt((An * An + Bn * Bn) / (Ad * Ad + Bd * Bd))
+
 
 # Bounding box surrounding the point at given coordinates,
 # assuming local approximation of Earth surface as a sphere
@@ -116,28 +126,30 @@ def boundingBox(longitudeInDegrees, latitudeInDegrees, halfSideInKm):
     Returns:
     tuple: A tuple containing the minimum longitude, minimum latitude, maximum longitude, and maximum latitude of the bounding box.
     """
-        
+
     lat = deg2rad(latitudeInDegrees)
     lon = deg2rad(longitudeInDegrees)
-    halfSide = 1000*halfSideInKm
+    halfSide = 1000 * halfSideInKm
 
     # Radius of Earth at given latitude
     radius = WGS84EarthRadius(lat)
     # Radius of the parallel at given latitude
-    pradius = radius*math.cos(lat)
+    pradius = radius * math.cos(lat)
 
-    latMin = lat - halfSide/radius
-    latMax = lat + halfSide/radius
-    lonMin = lon - halfSide/pradius
-    lonMax = lon + halfSide/pradius
+    latMin = lat - halfSide / radius
+    latMax = lat + halfSide / radius
+    lonMin = lon - halfSide / pradius
+    lonMax = lon + halfSide / pradius
 
-    return (rad2deg(lonMin),rad2deg(latMin) ,rad2deg(lonMax) ,rad2deg(latMax) )
+    return (rad2deg(lonMin), rad2deg(latMin), rad2deg(lonMax), rad2deg(latMax))
 
 
+# fonction qui configure la requete sentinel (request_ndvi_img) et get_data (ndvi_img):
 
-#fonction qui configure la requete sentinel (request_ndvi_img) et get_data (ndvi_img):
 
-def get_ndvi_img(aoi_bbox,aoi_size, data_folder, start_date, end_date,evalscript_ndvi , config):
+def get_ndvi_img(
+    aoi_bbox, aoi_size, data_folder, start_date, end_date, evalscript_ndvi, config
+):
     """
     Gather sentinel data with a given evalscript and configuration.
 
@@ -153,27 +165,30 @@ def get_ndvi_img(aoi_bbox,aoi_size, data_folder, start_date, end_date,evalscript
     Returns:
     numpy.ndarray: The image and .tiff file in the data folder.
     """
-    
+
     request_ndvi_img = SentinelHubRequest(
-      data_folder=data_folder,
-      evalscript=evalscript_ndvi,
-      input_data=[
-          SentinelHubRequest.input_data(
-              data_collection=DataCollection.SENTINEL2_L2A,
-              time_interval=(start_date, end_date),
-              other_args={"dataFilter": {"mosaickingOrder": "leastCC"}},
-          )
-      ],
-      responses=[SentinelHubRequest.output_response("default", MimeType.TIFF)],
-      bbox=aoi_bbox,
-      size=aoi_size,
-      config=config,   
-  )
+        data_folder=data_folder,
+        evalscript=evalscript_ndvi,
+        input_data=[
+            SentinelHubRequest.input_data(
+                data_collection=DataCollection.SENTINEL2_L2A,
+                time_interval=(start_date, end_date),
+                other_args={"dataFilter": {"mosaickingOrder": "leastCC"}},
+            )
+        ],
+        responses=[SentinelHubRequest.output_response("default", MimeType.TIFF)],
+        bbox=aoi_bbox,
+        size=aoi_size,
+        config=config,
+    )
 
     ndvi_img = request_ndvi_img.get_data(save_data=True)
     return ndvi_img
 
-def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir):
+
+def concatenate_tiff_images(
+    sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir
+):
     """
     Concatenate the TIFF images in the given directory into a single TIFF image.
 
@@ -185,8 +200,8 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
     Returns:
     Save the merged TIFF image in the sentinel_merged_dir and show the image.
     """
-    #Delete all XML files in the directory
-    for file in glob.glob(sentinel_tiff_dir+"/**/*.tiff", recursive=True):
+    # Delete all XML files in the directory
+    for file in glob.glob(sentinel_tiff_dir + "/**/*.tiff", recursive=True):
         os.remove(file)
 
     # Gather the paths of the .tiff files
@@ -194,19 +209,21 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
 
     # Move the .tiff images to the directory and increment the name
     for i, tiff_file in enumerate(tiff_files):
-        shutil.move(tiff_file, sentinel_tiff_dir+f"/image_{i}.tiff")
+        shutil.move(tiff_file, sentinel_tiff_dir + f"/image_{i}.tiff")
 
     # Load all TIFF images
-    tiff_images = [cv2.imread(tiff_file, cv2.IMREAD_UNCHANGED) for tiff_file in tiff_files]
+    tiff_images = [
+        cv2.imread(tiff_file, cv2.IMREAD_UNCHANGED) for tiff_file in tiff_files
+    ]
 
-    #Delete all XML files in the directory
-    for file in glob.glob(sentinel_tiff_dir+"/**/*.xml", recursive=True):
+    # Delete all XML files in the directory
+    for file in glob.glob(sentinel_tiff_dir + "/**/*.xml", recursive=True):
         os.remove(file)
-    #delete all files in the directory request
+    # delete all files in the directory request
     shutil.rmtree(sentinel_request_dir)
 
     # Get the paths of .tiff files
-    tiff_files = glob.glob(sentinel_tiff_dir+"/*.tiff")
+    tiff_files = glob.glob(sentinel_tiff_dir + "/*.tiff")
 
     # Open all TIFF files
     tiffs = [gdal.Open(tiff_file) for tiff_file in tiff_files]
@@ -217,11 +234,11 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
     projection = tiffs[0].GetProjection()
 
     # Create a VRT (Virtual Dataset) from the TIFF files
-    vrt_options = gdal.BuildVRTOptions(resampleAlg='nearest')
-    vrt = gdal.BuildVRT('merged.vrt', tiff_files, options=vrt_options)
+    vrt_options = gdal.BuildVRTOptions(resampleAlg="nearest")
+    vrt = gdal.BuildVRT("merged.vrt", tiff_files, options=vrt_options)
 
     # Initial path of the output file
-    output_file = os.path.join(sentinel_merged_dir, 'merged_image.tiff')
+    output_file = os.path.join(sentinel_merged_dir, "merged_image.tiff")
 
     # Increment the filename if it already exists
     base, extension = os.path.splitext(output_file)
@@ -233,14 +250,16 @@ def concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_me
     # Convert the VRT to a TIFF
     gdal.Translate(output_file, vrt)
 
-    # Load the last merged image
-    merged_image = cv2.imread(output_file, cv2.IMREAD_UNCHANGED)
+    return output_file
 
-    # Function to plot the image
-    def plot_image(image, factor=1):
-        plt.imshow(image * factor, cmap='gray')
-        plt.axis('off')
-        plt.show()
 
-    # Display the merged image
-    plot_image(merged_image, factor=1 / 255)
+def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, data_folder, sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir):
+    points = generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km)
+    for point in points:
+        lon, lat = point
+        bbox = boundingBox(lon, lat, spacing_km / 2)
+        size = (resolution, resolution)
+        get_ndvi_img(bbox, size, data_folder, start_date, end_date, evalscript_ndvi, config)
+
+    output_file = concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir)
+    return output_file
