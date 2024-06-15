@@ -10,6 +10,12 @@ from sentinelhub import SentinelHubRequest, DataCollection, MimeType
 import math
 import numpy as np
 
+from sentinelhub import (
+    CRS,
+    BBox,
+    bbox_to_dimensions,
+)
+
 
 def move_coords(longitude, latitude, dist, dir):
     """
@@ -253,13 +259,16 @@ def concatenate_tiff_images(
     return output_file
 
 
-def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, data_folder, sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir):
-    points = generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km)
+def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir):
+    points, max_points_in_line, num_lines, points_per_line = generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km)
+
+    points = [(y, x) for x, y in points]
+
     for point in points:
-        lon, lat = point
-        bbox = boundingBox(lon, lat, spacing_km / 2)
-        size = (resolution, resolution)
-        get_ndvi_img(bbox, size, data_folder, start_date, end_date, evalscript_ndvi, config)
+        bbox = boundingBox(point[0],point[1], spacing_km / 2)
+        aoi_bbox_list = (BBox(bbox=bbox, crs=CRS.WGS84))
+        aoi_size = bbox_to_dimensions(aoi_bbox_list, resolution=resolution)
+        get_ndvi_img(aoi_bbox_list, aoi_size, sentinel_request_dir, start_date, end_date, evalscript_ndvi, config)
 
     output_file = concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir)
     return output_file
