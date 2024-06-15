@@ -70,7 +70,7 @@ def fetch_weather(input_path: str, date_start: datetime.date, date_end: datetime
 
 def reshape_weather(
     input_path: str,
-    weather_data: list[pd.Dataframe],
+    weather_data: list,
     mask_types: list[str] = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"],
 ):
     """

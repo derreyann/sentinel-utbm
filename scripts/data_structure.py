@@ -38,7 +38,12 @@ class Event:
         self.end_date = end_date
         self.bbox_coords = bbox_coords
 
-    def get_weather_data(self, output_dir: str, masks: list[str]):
+    def get_weather_data(
+        self,
+        output_dir: str = "../data/modis/final",
+        masks: list[str] = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"],
+    ):
+        # need to add check to ensure modis files are available
         weather_files = weather.get_weather(
             self.modis_path[0], self.start_date, self.end_date, output_dir, masks
         )
