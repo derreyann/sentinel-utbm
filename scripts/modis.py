@@ -6,6 +6,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import pymodis
+from pyproj import Proj
 import rasterio
 from rasterio.warp import Resampling
 import rioxarray as rxr
@@ -23,16 +24,12 @@ def dataflow(
     end_date,
     lat: float,
     lon: float,
-    tiles: str = "h14v03",
     product: str = "MOD14A1.061",
     raw_dir: str = "../data/modis/raw",
     processing_dir: str = "../data/modis/processing",
     output_dir: str = "../data/modis/final",
 ):
-    if not tiles and (not lat or not lon):
-        raise ValueError("Either the tile name or the latitude and longitude needs to be set")
-    if not tiles:
-        tiles = get_tile(lat, lon)
+    tiles = get_tile(lat, lon)
 
     # Download data
     textfile_path = download_modis(
@@ -312,6 +309,9 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     return output_full_path
 
 
+
+
+
 def get_tile(
     lat_geographic: float, lon_geographic: float
 ) -> tuple[int, int, float, float]:
@@ -325,18 +325,19 @@ def get_tile(
     Returns:
     tuple[int, int, float, float]: A tuple containing the vertical tile index, horizontal tile index, line and sample pixel coordinates.
     """
+    CELLS = 2400
+    VERTICAL_TILES = 18
+    HORIZONTAL_TILES = 36
+    EARTH_RADIUS = 6371007.181
+    EARTH_WIDTH = 2 * math.pi * EARTH_RADIUS
 
-    if lat_geographic < -90 or lat_geographic > 90:
-        raise ValueError("lat_geographic should be in range of [-90, 90]")
-    if lon_geographic < -180 or lon_geographic > 180:
-        raise ValueError("lon_geographic should be in range of [-180, 180]")
+    TILE_WIDTH = EARTH_WIDTH / HORIZONTAL_TILES
+    TILE_HEIGHT = TILE_WIDTH
+    CELL_SIZE = TILE_WIDTH / CELLS
 
-    lat_tile = lat_geographic
-    lon_tile = lon_geographic * math.cos(math.radians(lat_geographic))
+    MODIS_GRID = Proj(f'+proj=sinu +R={EARTH_RADIUS} +nadgrids=@null +wktext')
 
-    vertical_tile = int((90 - lat_tile) / 10)
-    horizontal_tile = int((lon_tile + 180) / 10)
-    line = -(lat_tile - 90 + vertical_tile * 10) * 120 - 0.5
-    sample = (180 - horizontal_tile * 10 + lon_tile) * 120 - 0.5
-    tile = f"h{0:02}v{1:02}".format(vertical_tile, horizontal_tile)
-    return tile
+    x, y = MODIS_GRID(lon_geographic, lat_geographic)
+    h = int((EARTH_WIDTH * .5 + x) / TILE_WIDTH)
+    v = int(-(EARTH_WIDTH * .25 + y - (VERTICAL_TILES - 0) * TILE_HEIGHT) / TILE_HEIGHT)
+    return f'h{h:02d}v{v:02d}'
