@@ -24,11 +24,15 @@ def get_weather(
     - date_start: Start date for weather data fetching.
     - date_end: End date for weather data fetching.
     - output_dir: Directory to save the output mask files.
-    - mask_types: List of weather features to include in the masks.
+    - mask_types: Must be str in "'tavg','tmin','tmax','prcp','snow','wdir','wspd','wpgt','pres','tsun'". List of weather features to include in the masks.
+
+    Returns:
+    - files: list of path to weather data
     """
     data = fetch_weather(input_path, date_start, date_end)
     masks = reshape_weather(input_path, data, mask_types)
-    save_weather(masks, input_path, output_dir)
+    files = save_weather(masks, input_path, output_dir)
+    return files
 
 
 def fetch_weather(input_path: str, date_start: datetime.date, date_end: datetime.date):
