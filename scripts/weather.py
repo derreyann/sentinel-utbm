@@ -29,10 +29,19 @@ def get_weather(
     Returns:
     - files: list of path to weather data
     """
-    data = fetch_weather(input_path, date_start, date_end)
-    masks = reshape_weather(input_path, data, mask_types)
-    files = save_weather(masks, input_path, output_dir)
-    return files
+    file_paths = []
+    for mask in mask_types:
+        # Create the filename based on the mask key
+        filename = f"{os.path.basename(input_path)}.{mask}"
+        path = os.path.join(output_dir, filename)
+        if os.path.exists(path):
+            file_paths.append(path)
+        else: 
+            data = fetch_weather(input_path, date_start, date_end)
+            masks = reshape_weather(input_path, data, mask_types)
+            file_paths = save_weather(masks, input_path, output_dir)
+            break
+    return file_paths
 
 
 def fetch_weather(input_path: str, date_start: datetime.date, date_end: datetime.date):
