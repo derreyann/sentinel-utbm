@@ -69,7 +69,6 @@ return colorBlend(ndvi,
 """
 
 
-
 evalscript_CloudFree_Composite = """
 //VERSION=3
 function setup() {

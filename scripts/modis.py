@@ -1,16 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
-import warnings
 
 
 import numpy as np
-import pandas as pd
 import pymodis
 from pyproj import Proj
 import rasterio
 from rasterio.warp import Resampling
 import rioxarray as rxr
-import tqdm
 import yaml
 import xarray as xr
 import math
@@ -42,8 +39,10 @@ def dataflow(
     textfile_path = os.path.join(raw_dir, textfile_name)
     hdf_files = get_modis_hdf_filelist(textfile_path)
 
-    fire_files, start_date, end_date, bbox_coords = get_event_dimensions(hdf_files, processing_dir)
-    
+    fire_files, start_date, end_date, bbox_coords = get_event_dimensions(
+        hdf_files, processing_dir
+    )
+
     final_array = []
     for file in fire_files:
         cropped = crop(file, bbox_coords, processing_dir)
@@ -63,7 +62,7 @@ def get_modis_hdf_filelist(textfile_path: str):
 
 
 def get_event_dimensions(hdf_files, processing_dir):
-    """ This functions extracts the spatial and time dimension out of an event"""
+    """This functions extracts the spatial and time dimension out of an event"""
     fire_files = []
     coordinates_array = []
     date_array = []
@@ -86,10 +85,10 @@ def get_event_dimensions(hdf_files, processing_dir):
 
     if not fire_files:
         raise ValueError("No fire founds")
-    
+
     # Extract the first and last date out of that array
-    start_date = date_array[ 0][0]
-    end_date   = date_array[-1][1]
+    start_date = date_array[0][0]
+    end_date = date_array[-1][1]
     bbox_coords = create_bounding_box(coordinates_array)
     return fire_files, start_date, end_date, bbox_coords
 
@@ -171,12 +170,9 @@ def extract_fire_mask(
         return output_full_path, date_objects
 
     # Retrieve data
-    
 
     # Reproject
     dataset = dataset.rio.reproject("EPSG:4326")
-
-
 
     dataset.FireMask.rio.write_nodata(0, inplace=True)
     dataset = dataset.FireMask.rio.reproject("EPSG:4326")
@@ -309,9 +305,6 @@ def resize(input_path: str, output_dir: str = "../data/modis/final") -> str:
     return output_full_path
 
 
-
-
-
 def get_tile(
     lat_geographic: float, lon_geographic: float
 ) -> tuple[int, int, float, float]:
@@ -335,9 +328,11 @@ def get_tile(
     TILE_HEIGHT = TILE_WIDTH
     CELL_SIZE = TILE_WIDTH / CELLS
 
-    MODIS_GRID = Proj(f'+proj=sinu +R={EARTH_RADIUS} +nadgrids=@null +wktext')
+    MODIS_GRID = Proj(f"+proj=sinu +R={EARTH_RADIUS} +nadgrids=@null +wktext")
 
     x, y = MODIS_GRID(lon_geographic, lat_geographic)
-    h = int((EARTH_WIDTH * .5 + x) / TILE_WIDTH)
-    v = int(-(EARTH_WIDTH * .25 + y - (VERTICAL_TILES - 0) * TILE_HEIGHT) / TILE_HEIGHT)
-    return f'h{h:02d}v{v:02d}'
+    h = int((EARTH_WIDTH * 0.5 + x) / TILE_WIDTH)
+    v = int(
+        -(EARTH_WIDTH * 0.25 + y - (VERTICAL_TILES - 0) * TILE_HEIGHT) / TILE_HEIGHT
+    )
+    return f"h{h:02d}v{v:02d}"
