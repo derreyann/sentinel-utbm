@@ -248,20 +248,22 @@ def concatenate_tiff_images(
     if(not os.path.exists(sentinel_merged_dir)):
         os.mkdir(sentinel_merged_dir)
 
-    # Create a VRT (Virtual Dataset) from the TIFF files
-    vrt_options = gdal.BuildVRTOptions(resampleAlg="nearest")
-    vrt = gdal.BuildVRT("merged.vrt", tiff_files, options=vrt_options)
-
     # Initial path of the output file
     output_file = os.path.join(sentinel_merged_dir, "merged_image.tiff")
+    vrt_output_file =  os.path.join(sentinel_merged_dir, "merged.vrt")
 
     # Increment the filename if it already exists
     base, extension = os.path.splitext(output_file)
+    vrt_base, extension_vrt = os.path.splitext(output_file)
     counter = 1
     while os.path.exists(output_file):
         output_file = f"{base}_{counter}{extension}"
+        vrt_output_file = f"{vrt_base}_{counter}{extension_vrt}"
         counter += 1
 
+    # Create a VRT (Virtual Dataset) from the TIFF files
+    vrt_options = gdal.BuildVRTOptions(resampleAlg="nearest")
+    vrt = gdal.BuildVRT(vrt_output_file, tiff_files, options=vrt_options)
     # Convert the VRT to a TIFF
     gdal.Translate(output_file, vrt)
 
