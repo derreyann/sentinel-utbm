@@ -206,22 +206,22 @@ def concatenate_tiff_images(
     Returns:
     Save the merged TIFF image in the sentinel_merged_dir and show the image.
     """
-    
+
     # Delete all XML files in the directory
     for file in glob.glob(sentinel_tiff_dir + "/**/*.tiff", recursive=True):
         os.remove(file)
 
     # Gather the paths of the .tiff files
     tiff_files = glob.glob(sentinel_request_dir + "/**/*.tiff", recursive=True)
-    
+
     if len(tiff_files) == 0:
         raise ValueError("No .tiff files found in the directory.")
-    
+
     print(tiff_files)
 
-    if(not os.path.exists(sentinel_tiff_dir)):
+    if not os.path.exists(sentinel_tiff_dir):
         os.mkdir(sentinel_tiff_dir)
-        
+
     # Move the .tiff images to the directory and increment the name
     for i, tiff_file in enumerate(tiff_files):
         shutil.move(tiff_file, sentinel_tiff_dir + f"/image_{i}.tiff")
@@ -247,23 +247,23 @@ def concatenate_tiff_images(
     metadata = tiffs[0].GetMetadata()
     geotransform = tiffs[0].GetGeoTransform()
     projection = tiffs[0].GetProjection()
-    
+
     print("--" * 10 + "INFO" + "--" * 10)
     print("Metadata:", metadata)
     print("Geotransform:", geotransform)
     print("Projection:", projection)
     print("--" * 10 + "INFO" + "--" * 10)
-    
-    if(not os.path.exists(sentinel_merged_dir)):
+
+    if not os.path.exists(sentinel_merged_dir):
         os.mkdir(sentinel_merged_dir)
 
     # Initial path of the output file
     output_file = os.path.join(sentinel_merged_dir, "merged_image.tiff")
-    vrt_output_file =  os.path.join(sentinel_merged_dir, "merged.vrt")
+    vrt_output_file = os.path.join(sentinel_merged_dir, "merged.vrt")
 
     # Increment the filename if it already exists
     base, extension = os.path.splitext(output_file)
-    vrt_base, extension_vrt = os.path.splitext(output_file)
+    vrt_base, extension_vrt = os.path.splitext(vrt_output_file)
     counter = 1
     while os.path.exists(output_file):
         output_file = f"{base}_{counter}{extension}"
@@ -279,16 +279,42 @@ def concatenate_tiff_images(
     return output_file
 
 
-def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir):
-    points, max_points_in_line, num_lines, points_per_line = generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km)
+def create_stitched_image(
+    lat_min,
+    lon_min,
+    lat_max,
+    lon_max,
+    spacing_km,
+    resolution,
+    start_date,
+    end_date,
+    evalscript_ndvi,
+    config,
+    sentinel_request_dir,
+    sentinel_tiff_dir,
+    sentinel_merge_dir,
+):
+    points, max_points_in_line, num_lines, points_per_line = generate_grid_within_box(
+        lat_min, lon_min, lat_max, lon_max, spacing_km
+    )
 
     points = [(y, x) for x, y in points]
 
     for point in points:
-        bbox = boundingBox(point[0],point[1], spacing_km / 2)
-        aoi_bbox_list = (BBox(bbox=bbox, crs=CRS.WGS84))
+        bbox = boundingBox(point[0], point[1], spacing_km / 2)
+        aoi_bbox_list = BBox(bbox=bbox, crs=CRS.WGS84)
         aoi_size = bbox_to_dimensions(aoi_bbox_list, resolution=resolution)
-        get_ndvi_img(aoi_bbox_list, aoi_size, sentinel_request_dir, start_date, end_date, evalscript_ndvi, config)
+        get_ndvi_img(
+            aoi_bbox_list,
+            aoi_size,
+            sentinel_request_dir,
+            start_date,
+            end_date,
+            evalscript_ndvi,
+            config,
+        )
 
-    output_file = concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir)
+    output_file = concatenate_tiff_images(
+        sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir
+    )
     return output_file
