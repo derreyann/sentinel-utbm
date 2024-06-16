@@ -159,49 +159,35 @@ class Event:
         Returns:
         np.ndarray: Tensor containing stacked data from all TIFF files.
         """
-        tiff_paths = self.get_all_tiff_paths()
-        # Initialize an empty list to store the arrays
-        bands_list = []
-        for path in tiff_paths:
-            with rasterio.open(path) as src:
-                bands = src.read()  # Read all bands
-                for i in range(bands.shape[0]):
-                    bands_list.append(bands[i])
+        # Get the number of 8-day periods
+        num_periods = len(self.modis_path)
+        full_stack = []
+        # Loop over each period
+        for i in range(num_periods):
+            weekly_stack = []
 
-        # Ensure all arrays have the same shape
-        shapes = [array.shape for array in bands_list]
-        if len(set(shapes)) != 1:
-            raise ValueError(
-                f"All input arrays must have the same shape, but got shapes: {shapes}"
-            )
+            # Dealing with daily data
+            to_average_paths = []
+            to_average_paths.append(self.modis_path[i])
+            to_average_paths.extend(self.weather_path[i])
 
-        # Stack all arrays along a new dimension (assuming they are of the same shape)
-        tensor = np.stack(bands_list, axis=0)
-        return tensor
+            for path in to_average_paths:
+                with rasterio.open(path) as src:
+                    array = src.read()  # Read all bands
+                    array = np.mean(array, axis=0)
+                    weekly_stack.append(array)
 
-def get_all_tiff_paths(self) -> list[list[str]]:
-    """
-    Gets all the TIFF file paths from the MODIS, weather, and Sentinel data, 
-    separated by 8-day periods.
-
-    Returns:
-    list of list of str: List of lists, each containing file paths for an 8-day period.
-    """
-    # Ensure we have data for MODIS, weather, and Sentinel
-    if not self.modis_path or not self.weather_path or not self.sentinel_resized_path:
-        return tiff_paths_by_period
-    
-    # Get the number of 8-day periods
-    num_periods = len(self.modis_path)
-    tiff_paths_by_period = []
-    # Loop over each period
-    for i in range(num_periods):
-        period_paths = []
-        period_paths.append(self.modis_path[i])
-        period_paths.extend(self.weather_path[i])
-        period_paths.append(self.sentinel_resized_path[i])
-        tiff_paths_by_period.append(period_paths)
-    return tiff_paths_by_period
+            # Dealing with Sentinel data
+            if self.sentinel_path:
+                with rasterio.open(self.sentinel_resized_path[i]) as src:
+                    array = src.read()
+                    for band in array:
+                        weekly_stack.append(band)
+            weekly_stack = np.stack(weekly_stack)
+            full_stack.append(weekly_stack)
+            shapes = [array.shape for array in weekly_stack]
+        final_stack = np.stack(full_stack)
+        return final_stack
 
 
 @dataclass
