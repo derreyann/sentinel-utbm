@@ -1,9 +1,10 @@
-import modis, weather
+import modis, weather, sentinel, evalscripts
 
 from pydantic import BaseModel, confloat, field_validator, ValidationInfo
 import datetime
 from dataclasses import dataclass
-from typing import Tuple
+import yaml
+from sentinelhub import SHConfig
 
 
 class Event:
@@ -19,6 +20,8 @@ class Event:
         # Initialize additional attributes
         self.modis_path = None
         self.bbox_coords = None
+        self.weather_path = None
+        self.sentinel_path = None
 
     def validate(self):
         # Perform the validation using Pydantic
@@ -50,7 +53,30 @@ class Event:
         self.weather_path = weather_files
 
     def get_sentinel_data(self):
-        return
+        with open("../config.yaml") as file:
+            credentials = yaml.safe_load(file)
+        user = credentials["sentinelhub"]["API_USER"]
+        password = credentials["sentinelhub"]["API_PASSWORD"]
+
+        config = SHConfig(sh_client_id=user, sh_client_secret=password)
+        evalscript = evalscripts.evalscript_ndvi
+
+        img_path = sentinel.create_stitched_image(
+            lat_min=self.bbox_coords[1],
+            lon_min=self.bbox_coords[0],
+            lat_max=self.bbox_coords[3],
+            lon_max=self.bbox_coords[2],
+            spacing_km=100,
+            resolution=300,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            evalscript_ndvi=evalscript,
+            config=config,
+            sentinel_request_dir="../data/sentinel/raw",
+            sentinel_tiff_dir="../data/sentinel/processing",
+            sentinel_merge_dir="../data/sentinel/final",
+        )
+        self.sentinel_path = img_path
 
 
 @dataclass
