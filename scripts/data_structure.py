@@ -12,7 +12,22 @@ import yaml
 
 
 class Event:
-    def __init__(self, start_date, end_date, latitude, longitude):
+    def __init__(
+        self,
+        start_date: datetime.date,
+        end_date: datetime.date,
+        latitude: float,
+        longitude: float,
+    ):
+        """
+        Initialize the Event object with start date, end date, latitude, and longitude.
+
+        Args:
+        start_date (datetime.date): The start date of the event.
+        end_date (datetime.date): The end date of the event.
+        latitude (float): Latitude of the event location.
+        longitude (float): Longitude of the event location.
+        """
         self.start_date = start_date
         self.end_date = end_date
         self.latitude = latitude
@@ -27,7 +42,10 @@ class Event:
         self.weather_path = None
         self.sentinel_path = None
 
-    def validate(self):
+    def validate(self) -> None:
+        """
+        Validate the event attributes using Pydantic model.
+        """
         # Perform the validation using Pydantic
         EventModel(
             start_date=self.start_date,
@@ -36,70 +54,105 @@ class Event:
             longitude=self.longitude,
         )
 
-    def get_modis_data(self):
+    def get_modis_data(self) -> None:
+        """
+        Fetch MODIS data for the event and update the event attributes with the fetched data.
+        """
         final_array, start_date, end_date, bbox_coords = modis.dataflow(
             self.start_date, self.end_date, self.latitude, self.longitude
         )
         self.modis_path = final_array
-        self.start_date = start_date.strftime("%Y-%m-%d")
-        self.end_date = end_date.strftime("%Y-%m-%d")
+        self.start_date = start_date
+        self.end_date = end_date
         self.bbox_coords = bbox_coords
 
     def get_weather_data(
         self,
         output_dir: str = "../data/modis/final",
         masks: list[str] = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"],
-    ):
-        # need to add check to ensure modis files are available
-        weather_files = weather.get_weather(
-            self.modis_path[0], self.start_date, self.end_date, output_dir, masks
-        )
-        self.weather_path = weather_files
+    ) -> None:
+        """
+        Fetch weather data for the event and update the event attributes with the fetched data.
+
+        Args:
+        output_dir (str): Directory to save the weather data.
+        masks (list[str]): List of weather variables to fetch.
+        """
+        weather_path_list = []
+        date = self.start_date
+        for _ in self.modis_path:
+            weather_files = weather.get_weather(
+                self.modis_path[0],
+                date,
+                date + datetime.timedelta(days=7),
+                output_dir,
+                masks,
+            )
+            date += datetime.timedelta(days=8)
+            weather_path_list.append(weather_files)
+        self.weather_path = weather_path_list
 
     def get_sentinel_data(
         self,
-        spacing_km=100,
-        resolution=300,
-        evalscript=evalscripts.evalscript_ndvi,
-        sentinel_request_dir="../data/sentinel/raw",
-        sentinel_tiff_dir="../data/sentinel/processing",
-        sentinel_merge_dir="../data/sentinel/final",
-    ):
-        img_name = self.get_weather_filename()
-        img_path = os.path.join(sentinel_merge_dir, f"{img_name}.tiff")
-        if not os.path.exists(img_path):
-            with open("../config.yaml") as file:
-                credentials = yaml.safe_load(file)
-            user = credentials["sentinelhub"]["API_USER"]
-            password = credentials["sentinelhub"]["API_PASSWORD"]
-            config = SHConfig(sh_client_id=user, sh_client_secret=password)
+        spacing_km: int = 100,
+        resolution: int = 300,
+        evalscript: str = evalscripts.evalscript_ndvi,
+        sentinel_request_dir: str = "../data/sentinel/raw",
+        sentinel_tiff_dir: str = "../data/sentinel/processing",
+        sentinel_merge_dir: str = "../data/sentinel/final",
+    ) -> None:
+        """
+        Fetch Sentinel data for the event and update the event attributes with the fetched data.
 
-            img_path = sentinel.create_stitched_image(
-                lat_min=self.bbox_coords[1],
-                lon_min=self.bbox_coords[0],
-                lat_max=self.bbox_coords[3],
-                lon_max=self.bbox_coords[2],
-                spacing_km=spacing_km,
-                resolution=resolution,
-                start_date=self.start_date,
-                end_date=self.end_date,
-                evalscript_ndvi=evalscript,
-                config=config,
-                sentinel_request_dir=sentinel_request_dir,
-                sentinel_tiff_dir=sentinel_tiff_dir,
-                sentinel_merge_dir=sentinel_merge_dir,
-                img_name=img_name,
-            )
-        resized_path = modis.resize(img_path, sentinel_merge_dir)
-        self.sentinel_path = img_path
-        self.sentinel_resized_path = resized_path
-
-    def get_weather_filename(self):
+        Args:
+        spacing_km (int): Spacing in kilometers for the Sentinel image.
+        resolution (int): Resolution for the Sentinel image.
+        evalscript (str): Evaluation script for Sentinel data processing.
+        sentinel_request_dir (str): Directory to save the raw Sentinel requests.
+        sentinel_tiff_dir (str): Directory to save the processed Sentinel TIFFs.
+        sentinel_merge_dir (str): Directory to save the final merged Sentinel images.
+        """
+        # init storing arrays
+        sentinel_path_list = []
+        sentinel_resized_path_list = []
+        date = self.start_date
+        # Get the tile number to create the img path
         tile = modis.get_tile(self.latitude, self.longitude)
-        filename = f"{tile}_{str(self.start_date)[:10]}_{str(self.end_date[:10])}"
-        return filename
+        # Loop over the number of modis files spanning 8 days
+        for _ in self.modis_path:
+            img_name = f"{tile}_{date.strftime("%Y-%m-%d")}_{(date + datetime.timedelta(days=7)).strftime("%Y-%m-%d")}"
+            img_path = os.path.join(sentinel_merge_dir, f"{img_name}.tiff")
+            if not os.path.exists(img_path):
+                with open("../config.yaml") as file:
+                    credentials = yaml.safe_load(file)
+                user = credentials["sentinelhub"]["API_USER"]
+                password = credentials["sentinelhub"]["API_PASSWORD"]
+                config = SHConfig(sh_client_id=user, sh_client_secret=password)
 
-    def create_tensor_from_tiffs(self):
+                img_path = sentinel.create_stitched_image(
+                    lat_min=self.bbox_coords[1],
+                    lon_min=self.bbox_coords[0],
+                    lat_max=self.bbox_coords[3],
+                    lon_max=self.bbox_coords[2],
+                    spacing_km=spacing_km,
+                    resolution=resolution,
+                    start_date=date,
+                    end_date=date + datetime.timedelta(days=7),
+                    evalscript_ndvi=evalscript,
+                    config=config,
+                    sentinel_request_dir=sentinel_request_dir,
+                    sentinel_tiff_dir=sentinel_tiff_dir,
+                    sentinel_merge_dir=sentinel_merge_dir,
+                    img_name=img_name,
+                )
+            date += datetime.timedelta(days=8)
+            resized_path = modis.resize(img_path, sentinel_merge_dir)
+            sentinel_path_list.append(img_path)
+            sentinel_resized_path_list.append(resized_path)
+        self.sentinel_path = sentinel_path_list
+        self.sentinel_resized_path = sentinel_resized_path_list
+
+    def create_tensor_from_tiffs(self) -> np.ndarray:
         """
         Creates a tensor using the event's list of TIFF file paths.
 
@@ -124,33 +177,31 @@ class Event:
 
         # Stack all arrays along a new dimension (assuming they are of the same shape)
         tensor = np.stack(bands_list, axis=0)
-
         return tensor
 
-    def get_all_tiff_paths(self):
-        """
-        Gets all the TIFF file paths from the MODIS, weather, and Sentinel data.
+def get_all_tiff_paths(self) -> list[list[str]]:
+    """
+    Gets all the TIFF file paths from the MODIS, weather, and Sentinel data, 
+    separated by 8-day periods.
 
-        Parameters:
-        event (Event): An instance of the Event class.
-
-        Returns:
-        list of str: List of file paths to all TIFF files.
-        """
-        tiff_paths = []
-
-        # Add MODIS paths
-        if self.modis_path:
-            tiff_paths.extend(self.modis_path)
-
-        # Add weather paths
-        if self.weather_path:
-            tiff_paths.extend(self.weather_path)
-
-        # Add Sentinel paths
-        if self.sentinel_resized_path:
-            tiff_paths.append(self.sentinel_resized_path)
-        return tiff_paths
+    Returns:
+    list of list of str: List of lists, each containing file paths for an 8-day period.
+    """
+    # Ensure we have data for MODIS, weather, and Sentinel
+    if not self.modis_path or not self.weather_path or not self.sentinel_resized_path:
+        return tiff_paths_by_period
+    
+    # Get the number of 8-day periods
+    num_periods = len(self.modis_path)
+    tiff_paths_by_period = []
+    # Loop over each period
+    for i in range(num_periods):
+        period_paths = []
+        period_paths.append(self.modis_path[i])
+        period_paths.extend(self.weather_path[i])
+        period_paths.append(self.sentinel_resized_path[i])
+        tiff_paths_by_period.append(period_paths)
+    return tiff_paths_by_period
 
 
 @dataclass
@@ -164,9 +215,18 @@ class EventModel(BaseModel):
         self,
         start_date: datetime.date,
         end_date: datetime.date,
-        latitude: confloat(ge=-90, le=90),
-        longitude: confloat(ge=-180, le=180),
+        latitude: float,
+        longitude: float,
     ):
+        """
+        Initialize the EventModel object with start date, end date, latitude, and longitude.
+
+        Args:
+        start_date (datetime.date): The start date of the event.
+        end_date (datetime.date): The end date of the event.
+        latitude (float): Latitude of the event location.
+        longitude (float): Longitude of the event location.
+        """
         super().__init__(
             start_date=start_date,
             end_date=end_date,
@@ -176,7 +236,19 @@ class EventModel(BaseModel):
 
     @field_validator("end_date")
     def check_date_order(cls, v: datetime.date, info: ValidationInfo) -> datetime.date:
-        """Validates that the end_date is not before the start_date"""
+        """
+        Validates that the end_date is not before the start_date.
+
+        Args:
+        v (datetime.date): The end date to validate.
+        info (ValidationInfo): Additional information for validation.
+
+        Returns:
+        datetime.date: Validated end date.
+
+        Raises:
+        ValueError: If the end date is before the start date.
+        """
         if "start_date" in info.data and v < info.data["start_date"]:
             raise ValueError("End date must be after start date.")
         return v
