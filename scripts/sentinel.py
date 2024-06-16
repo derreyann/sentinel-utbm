@@ -214,6 +214,9 @@ def concatenate_tiff_images(
     # Gather the paths of the .tiff files
     tiff_files = glob.glob(sentinel_request_dir + "/**/*.tiff", recursive=True)
     
+    if len(tiff_files) == 0:
+        raise ValueError("No .tiff files found in the directory.")
+    
     print(tiff_files)
 
     if(not os.path.exists(sentinel_tiff_dir)):
@@ -244,6 +247,12 @@ def concatenate_tiff_images(
     metadata = tiffs[0].GetMetadata()
     geotransform = tiffs[0].GetGeoTransform()
     projection = tiffs[0].GetProjection()
+    
+    print("--" * 10 + "INFO" + "--" * 10)
+    print("Metadata:", metadata)
+    print("Geotransform:", geotransform)
+    print("Projection:", projection)
+    print("--" * 10 + "INFO" + "--" * 10)
     
     if(not os.path.exists(sentinel_merged_dir)):
         os.mkdir(sentinel_merged_dir)
