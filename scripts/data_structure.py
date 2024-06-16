@@ -52,29 +52,35 @@ class Event:
         )
         self.weather_path = weather_files
 
-    def get_sentinel_data(self):
+    def get_sentinel_data(
+        self,
+        spacing_km=100,
+        resolution=300,
+        evalscript=evalscripts.evalscript_ndvi,
+        sentinel_request_dir="../data/sentinel/raw",
+        sentinel_tiff_dir="../data/sentinel/processing",
+        sentinel_merge_dir="../data/sentinel/final",
+    ):
         with open("../config.yaml") as file:
             credentials = yaml.safe_load(file)
         user = credentials["sentinelhub"]["API_USER"]
         password = credentials["sentinelhub"]["API_PASSWORD"]
-
         config = SHConfig(sh_client_id=user, sh_client_secret=password)
-        evalscript = evalscripts.evalscript_ndvi
 
         img_path = sentinel.create_stitched_image(
             lat_min=self.bbox_coords[1],
             lon_min=self.bbox_coords[0],
             lat_max=self.bbox_coords[3],
             lon_max=self.bbox_coords[2],
-            spacing_km=100,
-            resolution=300,
+            spacing_km=spacing_km,
+            resolution=resolution,
             start_date=self.start_date,
             end_date=self.end_date,
             evalscript_ndvi=evalscript,
             config=config,
-            sentinel_request_dir="../data/sentinel/raw",
-            sentinel_tiff_dir="../data/sentinel/processing",
-            sentinel_merge_dir="../data/sentinel/final",
+            sentinel_request_dir=sentinel_request_dir,
+            sentinel_tiff_dir=sentinel_tiff_dir,
+            sentinel_merge_dir=sentinel_merge_dir,
         )
         self.sentinel_path = img_path
 
