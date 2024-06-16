@@ -206,13 +206,19 @@ def concatenate_tiff_images(
     Returns:
     Save the merged TIFF image in the sentinel_merged_dir and show the image.
     """
+    
     # Delete all XML files in the directory
     for file in glob.glob(sentinel_tiff_dir + "/**/*.tiff", recursive=True):
         os.remove(file)
 
     # Gather the paths of the .tiff files
     tiff_files = glob.glob(sentinel_request_dir + "/**/*.tiff", recursive=True)
+    
+    print(tiff_files)
 
+    if(not os.path.exists(sentinel_tiff_dir)):
+        os.mkdir(sentinel_tiff_dir)
+        
     # Move the .tiff images to the directory and increment the name
     for i, tiff_file in enumerate(tiff_files):
         shutil.move(tiff_file, sentinel_tiff_dir + f"/image_{i}.tiff")
@@ -238,6 +244,9 @@ def concatenate_tiff_images(
     metadata = tiffs[0].GetMetadata()
     geotransform = tiffs[0].GetGeoTransform()
     projection = tiffs[0].GetProjection()
+    
+    if(not os.path.exists(sentinel_merged_dir)):
+        os.mkdir(sentinel_merged_dir)
 
     # Create a VRT (Virtual Dataset) from the TIFF files
     vrt_options = gdal.BuildVRTOptions(resampleAlg="nearest")
@@ -259,7 +268,7 @@ def concatenate_tiff_images(
     return output_file
 
 
-def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir):
+def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolution, start_date, end_date, evalscript_ndvi, config, sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir):
     points, max_points_in_line, num_lines, points_per_line = generate_grid_within_box(lat_min, lon_min, lat_max, lon_max, spacing_km)
 
     points = [(y, x) for x, y in points]
@@ -270,5 +279,5 @@ def create_stitched_image(lat_min, lon_min, lat_max, lon_max, spacing_km, resolu
         aoi_size = bbox_to_dimensions(aoi_bbox_list, resolution=resolution)
         get_ndvi_img(aoi_bbox_list, aoi_size, sentinel_request_dir, start_date, end_date, evalscript_ndvi, config)
 
-    output_file = concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir)
+    output_file = concatenate_tiff_images(sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir)
     return output_file
