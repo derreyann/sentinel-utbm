@@ -1,10 +1,14 @@
 import modis, weather, sentinel, evalscripts
 
+import os
+
 from pydantic import BaseModel, confloat, field_validator, ValidationInfo
 import datetime
 from dataclasses import dataclass
-import yaml
+import numpy as np
+import rasterio
 from sentinelhub import SHConfig
+import yaml
 
 
 class Event:
@@ -37,8 +41,8 @@ class Event:
             self.start_date, self.end_date, self.latitude, self.longitude
         )
         self.modis_path = final_array
-        self.start_date = start_date
-        self.end_date = end_date
+        self.start_date = start_date.strftime("%Y-%m-%d")
+        self.end_date = end_date.strftime("%Y-%m-%d")
         self.bbox_coords = bbox_coords
 
     def get_weather_data(
@@ -61,28 +65,92 @@ class Event:
         sentinel_tiff_dir="../data/sentinel/processing",
         sentinel_merge_dir="../data/sentinel/final",
     ):
-        with open("../config.yaml") as file:
-            credentials = yaml.safe_load(file)
-        user = credentials["sentinelhub"]["API_USER"]
-        password = credentials["sentinelhub"]["API_PASSWORD"]
-        config = SHConfig(sh_client_id=user, sh_client_secret=password)
+        img_name = self.get_weather_filename()
+        img_path = os.path.join(sentinel_merge_dir, f"{img_name}.tiff")
+        if not os.path.exists(img_path):
+            with open("../config.yaml") as file:
+                credentials = yaml.safe_load(file)
+            user = credentials["sentinelhub"]["API_USER"]
+            password = credentials["sentinelhub"]["API_PASSWORD"]
+            config = SHConfig(sh_client_id=user, sh_client_secret=password)
 
-        img_path = sentinel.create_stitched_image(
-            lat_min=self.bbox_coords[1],
-            lon_min=self.bbox_coords[0],
-            lat_max=self.bbox_coords[3],
-            lon_max=self.bbox_coords[2],
-            spacing_km=spacing_km,
-            resolution=resolution,
-            start_date=self.start_date,
-            end_date=self.end_date,
-            evalscript_ndvi=evalscript,
-            config=config,
-            sentinel_request_dir=sentinel_request_dir,
-            sentinel_tiff_dir=sentinel_tiff_dir,
-            sentinel_merge_dir=sentinel_merge_dir,
-        )
+            img_path = sentinel.create_stitched_image(
+                lat_min=self.bbox_coords[1],
+                lon_min=self.bbox_coords[0],
+                lat_max=self.bbox_coords[3],
+                lon_max=self.bbox_coords[2],
+                spacing_km=spacing_km,
+                resolution=resolution,
+                start_date=self.start_date,
+                end_date=self.end_date,
+                evalscript_ndvi=evalscript,
+                config=config,
+                sentinel_request_dir=sentinel_request_dir,
+                sentinel_tiff_dir=sentinel_tiff_dir,
+                sentinel_merge_dir=sentinel_merge_dir,
+                img_name=img_name,
+            )
+        resized_path = modis.resize(img_path, sentinel_merge_dir)
         self.sentinel_path = img_path
+        self.sentinel_resized_path = resized_path
+
+    def get_weather_filename(self):
+        tile = modis.get_tile(self.latitude, self.longitude)
+        filename = f"{tile}_{str(self.start_date)[:10]}_{str(self.end_date[:10])}"
+        return filename
+
+    def create_tensor_from_tiffs(self):
+        """
+        Creates a tensor using the event's list of TIFF file paths.
+
+        Returns:
+        np.ndarray: Tensor containing stacked data from all TIFF files.
+        """
+        tiff_paths = self.get_all_tiff_paths()
+        # Initialize an empty list to store the arrays
+        bands_list = []
+        for path in tiff_paths:
+            with rasterio.open(path) as src:
+                bands = src.read()  # Read all bands
+                for i in range(bands.shape[0]):
+                    bands_list.append(bands[i])
+
+        # Ensure all arrays have the same shape
+        shapes = [array.shape for array in bands_list]
+        if len(set(shapes)) != 1:
+            raise ValueError(
+                f"All input arrays must have the same shape, but got shapes: {shapes}"
+            )
+
+        # Stack all arrays along a new dimension (assuming they are of the same shape)
+        tensor = np.stack(bands_list, axis=0)
+
+        return tensor
+
+    def get_all_tiff_paths(self):
+        """
+        Gets all the TIFF file paths from the MODIS, weather, and Sentinel data.
+
+        Parameters:
+        event (Event): An instance of the Event class.
+
+        Returns:
+        list of str: List of file paths to all TIFF files.
+        """
+        tiff_paths = []
+
+        # Add MODIS paths
+        if self.modis_path:
+            tiff_paths.extend(self.modis_path)
+
+        # Add weather paths
+        if self.weather_path:
+            tiff_paths.extend(self.weather_path)
+
+        # Add Sentinel paths
+        if self.sentinel_resized_path:
+            tiff_paths.append(self.sentinel_resized_path)
+        return tiff_paths
 
 
 @dataclass

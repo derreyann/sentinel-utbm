@@ -36,7 +36,7 @@ def get_weather(
         path = os.path.join(output_dir, filename)
         if os.path.exists(path):
             file_paths.append(path)
-        else: 
+        else:
             data = fetch_weather(input_path, date_start, date_end)
             masks = reshape_weather(input_path, data, mask_types)
             file_paths = save_weather(masks, input_path, output_dir)

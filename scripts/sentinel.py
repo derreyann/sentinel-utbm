@@ -193,7 +193,7 @@ def get_ndvi_img(
 
 
 def concatenate_tiff_images(
-    sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir
+    sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir, img_name
 ):
     """
     Concatenate the TIFF images in the given directory into a single TIFF image.
@@ -258,8 +258,8 @@ def concatenate_tiff_images(
         os.mkdir(sentinel_merged_dir)
 
     # Initial path of the output file
-    output_file = os.path.join(sentinel_merged_dir, "merged_image.tiff")
-    vrt_output_file = os.path.join(sentinel_merged_dir, "merged.vrt")
+    output_file = os.path.join(sentinel_merged_dir, f"{img_name}.tiff")
+    vrt_output_file = os.path.join(sentinel_merged_dir, f"{img_name}.vrt")
 
     # Increment the filename if it already exists
     base, extension = os.path.splitext(output_file)
@@ -293,6 +293,7 @@ def create_stitched_image(
     sentinel_request_dir,
     sentinel_tiff_dir,
     sentinel_merge_dir,
+    img_name,
 ):
     points, max_points_in_line, num_lines, points_per_line = generate_grid_within_box(
         lat_min, lon_min, lat_max, lon_max, spacing_km
@@ -315,6 +316,6 @@ def create_stitched_image(
         )
 
     output_file = concatenate_tiff_images(
-        sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir
+        sentinel_request_dir, sentinel_tiff_dir, sentinel_merge_dir, img_name
     )
     return output_file
