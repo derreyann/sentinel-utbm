@@ -5,10 +5,6 @@ Utilities used by example notebooks
 from __future__ import annotations
 
 from typing import Any
-
-import os
-
-import rasterio
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -3,7 +3,6 @@ import os
 
 from meteostat import Daily, Point
 import numpy as np
-import pandas as pd
 import rasterio
 import rioxarray as rxr
 import tqdm

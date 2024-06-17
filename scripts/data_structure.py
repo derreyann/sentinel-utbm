@@ -1,5 +1,3 @@
-import modis, weather, sentinel, evalscripts
-
 import os
 
 from pydantic import BaseModel, confloat, field_validator, ValidationInfo
@@ -9,6 +7,8 @@ import numpy as np
 import rasterio
 from sentinelhub import SHConfig
 import yaml
+
+import modis, weather, sentinel, evalscripts
 
 
 class Event:
