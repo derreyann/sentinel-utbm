@@ -3,12 +3,11 @@ import shutil
 import glob
 from osgeo import gdal
 import cv2
-import matplotlib.pyplot as plt
 from geopy.distance import distance
 from geopy.point import Point
 from sentinelhub import SentinelHubRequest, DataCollection, MimeType
 import math
-import numpy as np
+
 
 from sentinelhub import (
     CRS,
@@ -206,6 +205,9 @@ def concatenate_tiff_images(
     Returns:
     Save the merged TIFF image in the sentinel_merged_dir and show the image.
     """
+    for dir in [sentinel_request_dir, sentinel_tiff_dir, sentinel_merged_dir]:
+        if not os.path.exists(dir):
+            os.makedirs(dir)     
 
     # Delete all XML files in the directory
     for file in glob.glob(sentinel_tiff_dir + "/**/*.tiff", recursive=True):
@@ -218,9 +220,6 @@ def concatenate_tiff_images(
         raise ValueError("No .tiff files found in the directory.")
 
     print(tiff_files)
-
-    if not os.path.exists(sentinel_tiff_dir):
-        os.mkdir(sentinel_tiff_dir)
 
     # Move the .tiff images to the directory and increment the name
     for i, tiff_file in enumerate(tiff_files):
@@ -253,9 +252,6 @@ def concatenate_tiff_images(
     print("Geotransform:", geotransform)
     print("Projection:", projection)
     print("--" * 10 + "INFO" + "--" * 10)
-
-    if not os.path.exists(sentinel_merged_dir):
-        os.mkdir(sentinel_merged_dir)
 
     # Initial path of the output file
     output_file = os.path.join(sentinel_merged_dir, f"{img_name}.tiff")

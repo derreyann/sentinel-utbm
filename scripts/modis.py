@@ -1,6 +1,6 @@
 from datetime import datetime
+import math
 import os
-
 
 import numpy as np
 import pymodis
@@ -10,8 +10,6 @@ from rasterio.warp import Resampling
 import rioxarray as rxr
 import yaml
 import xarray as xr
-import math
-
 
 from utils import create_bounding_box
 
@@ -111,7 +109,7 @@ def download_modis(
         return textfile_path
 
     # Create directory for our data
-    os.mkdir(full_path)
+    os.makedirs(full_path, exist_ok=True)
 
     # Fetch credentials for modis
     with open("../config.yaml") as file:
@@ -156,6 +154,9 @@ def extract_fire_mask(
     Returns:
     tuple[xr.Dataset, list[datetime], str]: The reprojected fire mask dataset, list of dates and the full path to the processed file.
     """
+    # Ensure the output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
     dataset = rxr.open_rasterio(input_path, masked=True)
     # TODO: remove if not needed with new weather functions
     # Extracts dates
@@ -326,7 +327,6 @@ def get_tile(
 
     TILE_WIDTH = EARTH_WIDTH / HORIZONTAL_TILES
     TILE_HEIGHT = TILE_WIDTH
-    CELL_SIZE = TILE_WIDTH / CELLS
 
     MODIS_GRID = Proj(f"+proj=sinu +R={EARTH_RADIUS} +nadgrids=@null +wktext")
 
