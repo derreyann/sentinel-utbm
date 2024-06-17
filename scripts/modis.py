@@ -23,7 +23,24 @@ def dataflow(
     raw_dir: str = "../data/modis/raw",
     processing_dir: str = "../data/modis/processing",
     output_dir: str = "../data/modis/final",
-):
+):  
+    """Main function to process MODIS data from download to final output.
+    
+    Args:
+        start_date (str): Start date for data retrieval.
+        end_date (str): End date for data retrieval.
+        lat (float): Latitude of the area of interest.
+        lon (float): Longitude of the area of interest.
+        product (str): MODIS product to retrieve.
+        raw_dir (str): Directory for raw data.
+        processing_dir (str): Directory for processing data.
+        output_dir (str): Directory for final output data.
+        resolution (int): Resolution for final output.
+
+    Returns:
+        tuple: Final processed data array, start date, end date, and bounding box coordinates.
+    """
+    # Determine the tile corresponding to the latitude and longitude
     tiles = get_tile(lat, lon)
 
     # Download data
@@ -37,10 +54,12 @@ def dataflow(
     textfile_path = os.path.join(raw_dir, textfile_name)
     hdf_files = get_modis_hdf_filelist(textfile_path)
 
+    # Get fire event dimensions and details
     fire_files, start_date, end_date, bbox_coords = get_event_dimensions(
         hdf_files, processing_dir
     )
 
+    # Process each fire file: crop and resize
     final_array = []
     for file in fire_files:
         cropped = crop(file, bbox_coords, processing_dir)
@@ -49,6 +68,14 @@ def dataflow(
 
 
 def get_modis_hdf_filelist(textfile_path: str):
+    """Retrieve the list of MODIS HDF files from a text file.
+
+    Args:
+        textfile_path (str): Path to the text file containing HDF file names.
+
+    Returns:
+        list: List of paths to HDF files.
+    """
     hdf_files = []
     dir = os.path.dirname(textfile_path)
     with open(textfile_path) as file:
@@ -60,7 +87,15 @@ def get_modis_hdf_filelist(textfile_path: str):
 
 
 def get_event_dimensions(hdf_files, processing_dir):
-    """This functions extracts the spatial and time dimension out of an event"""
+    """Extract spatial and temporal dimensions from fire event files.
+
+    Args:
+        hdf_files (list): List of HDF files.
+        processing_dir (str): Directory for processing files.
+
+    Returns:
+        tuple: Fire event files, start date, end date, and bounding box coordinates.
+    """
     fire_files = []
     coordinates_array = []
     date_array = []
@@ -99,7 +134,19 @@ def download_modis(
     path: str = "MOLT",
     product: str = "MOD14A1.061",
 ):
-    """Fetches all the modis files between specific dates"""
+    """Fetch MODIS files for a specific date range.
+
+    Args:
+        start_date (str): Start date for data retrieval.
+        end_date (str): End date for data retrieval.
+        output_dir (str): Directory to save the raw data.
+        tiles (str): MODIS tiles to download.
+        path (str): Path for the MODIS product.
+        product (str): MODIS product to retrieve.
+
+    Returns:
+        str: Path to the text file listing the downloaded MODIS files.
+    """
     full_path = os.path.join(output_dir, tiles)
 
     textfile_name = f"listfile{product}.txt"
