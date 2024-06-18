@@ -140,39 +140,45 @@ def interpolate_weather(masks):
     # Interpolate missing data using nearest neighbor interpolation
     for mask_type, mask in masks.items():
         for t in range(mask.shape[0]):
-            x, y = np.indices(mask[t].shape)
-            valid_mask = ~np.isnan(mask[t])
-            points = np.column_stack((x[valid_mask], y[valid_mask]))
-            values = mask[t][valid_mask]
-
-            grid_x, grid_y = np.indices(mask[t].shape)
-            mask_interpolated = griddata(
-                points, values, (grid_x, grid_y), method='linear'
-            )
-            
-            # Ensure mask_interpolated has the correct shape (128, 128)
-            mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
-            
-            # Assign interpolated mask to transposed_masks
-            masks[mask_type][t] = mask_interpolated
+            try:
+                x, y = np.indices(mask[t].shape)
+                valid_mask = ~np.isnan(mask[t])
+                points = np.column_stack((x[valid_mask], y[valid_mask]))
+                values = mask[t][valid_mask]
+                
+                grid_x, grid_y = np.indices(mask[t].shape)
+                mask_interpolated = griddata(
+                    points, values, (grid_x, grid_y), method='linear'
+                )
+                
+                # Ensure mask_interpolated has the correct shape (128, 128)
+                mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
+                
+                # Assign interpolated mask to transposed_masks
+                masks[mask_type][t] = mask_interpolated
+            except ValueError:
+                print("No linear interpolation: no data")
 
     for mask_type, mask in masks.items():
         for t in range(mask.shape[0]):
-            x, y = np.indices(mask[t].shape)
-            valid_mask = ~np.isnan(mask[t])
-            points = np.column_stack((x[valid_mask], y[valid_mask]))
-            values = mask[t][valid_mask]
+            try: 
+                x, y = np.indices(mask[t].shape)
+                valid_mask = ~np.isnan(mask[t])
+                points = np.column_stack((x[valid_mask], y[valid_mask]))
+                values = mask[t][valid_mask]
 
-            grid_x, grid_y = np.indices(mask[t].shape)
-            mask_interpolated = griddata(
-                points, values, (grid_x, grid_y), method='nearest'
-            )
-            
-            # Ensure mask_interpolated has the correct shape (128, 128)
-            mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
-            
-            # Assign interpolated mask to transposed_masks
-            masks[mask_type][t] = mask_interpolated
+                grid_x, grid_y = np.indices(mask[t].shape)
+                mask_interpolated = griddata(
+                    points, values, (grid_x, grid_y), method='nearest'
+                )
+                
+                # Ensure mask_interpolated has the correct shape (128, 128)
+                mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
+                
+                # Assign interpolated mask to transposed_masks
+                masks[mask_type][t] = mask_interpolated
+            except ValueError:
+                print("No nearest interpolation: no data")
 
         return masks
 
