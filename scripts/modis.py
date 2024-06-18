@@ -83,17 +83,25 @@ def dataflow(
         count = src.profile['count']
 
     # Update meta to reflect the number of layers
-    meta.update(count=len(sorted_file_paths)*count)
+    meta.update(count=(end_date - start_date).days + 1)
 
 
     # Read and stack all the data
     with rasterio.open(output_file, 'w', **meta) as dst:
+        current_band = 1
         for i, path in enumerate(sorted_file_paths):
             with rasterio.open(path) as src:
-                for j in range(1, count+1):
-                    band_nb = i*(count)+j
-                    print(band_nb, i, j, path)
-                    dst.write_band(band_nb, src.read(j))
+                julian_filename = os.path.basename(path)
+                julian_date_str = julian_filename.split('.')[1][1:]
+                days_left = 365 - int(julian_date_str[4:])
+                if days_left < 8:
+                    adjust_range = 7 - days_left
+                else:
+                    adjust_range = 0
+                for j in range(1, count+1 - adjust_range):  
+                    print(days_left, current_band, i, j)                  
+                    dst.write_band(current_band, src.read(j))
+                    current_band += 1
 
     return output_file, start_date, end_date, bbox_coords
 
@@ -112,6 +120,7 @@ def julian_to_date(year_and_julian):
     julian_day = int(year_and_julian[4:])
     date = datetime(year, 1, 1) + timedelta(julian_day - 1)
     return date
+
 
 def extract_julian_date(filepath):
     """Extract the Julian date from the filename."""
@@ -267,7 +276,7 @@ def extract_fire_mask(
     os.makedirs(output_dir, exist_ok=True)
 
     dataset = rxr.open_rasterio(input_path, masked=True)
-    # TODO: remove if not needed with new weather functions
+    # TODO: ACTUALLY LOOK AT ALL THE FUCKING FIRE MASKS NOT ONLY THE FIRST ONE ????
     # Extracts dates
     dates = dataset.attrs["DAYSOFYEAR"]
     dates = dates.split(", ")

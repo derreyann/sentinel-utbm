@@ -79,20 +79,15 @@ class Event:
         output_dir (str): Directory to save the weather data.
         masks (list[str]): List of weather variables to fetch.
         """
-        weather_path_list = []
-        date = self.start_date
-        for path in self.modis_path:
-            weather_files = weather.get_weather(
-                input_path = path,
-                date_start = date,
-                date_end = date + datetime.timedelta(days=7),
-                output_dir = output_dir,
-                masks = masks,
-                interpolate = interpolate,
-            )
-            date += datetime.timedelta(days=8)
-            weather_path_list.append(weather_files)
-        self.weather_path = weather_path_list
+        weather_files = weather.get_weather(
+            input_path = self.modis_path,
+            date_start = self.start_date,
+            date_end = self.end_date,
+            output_dir = output_dir,
+            mask_types = masks,
+            interpolate = interpolate,
+        )
+        self.weather_path = weather_files
 
     def get_sentinel_data(
         self,
@@ -147,7 +142,7 @@ class Event:
                     sentinel_merge_dir=sentinel_merge_dir,
                     img_name=img_name,
                 )
-            date += datetime.timedelta(days=8)
+            date += datetime.timedelta(days=5)
             resized_path = modis.resize(img_path, sentinel_merge_dir)
             sentinel_path_list.append(img_path)
             sentinel_resized_path_list.append(resized_path)
@@ -164,6 +159,7 @@ class Event:
         # Get the number of 8-day periods
         num_periods = len(self.modis_path)
         full_stack = []
+
         # Loop over each period
         for i in range(num_periods):
             weekly_stack = []
