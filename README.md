@@ -11,7 +11,7 @@ Data sources:
 ## GDAL Installation
 
 Install GDAL with HDF4 support. This installation process will depend on your system.
-GDAL and the python bidings are needed.
+GDAL and the python bindings are needed.
 
 ### macOS
 
