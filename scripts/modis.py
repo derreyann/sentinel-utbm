@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import math
 import os
 
@@ -40,6 +40,8 @@ def dataflow(
     Returns:
         tuple: Final processed data array, start date, end date, and bounding box coordinates.
     """
+    for dir in [raw_dir, processing_dir, output_dir]:
+        os.makedirs(dir, exist_ok=True)
     # Determine the tile corresponding to the latitude and longitude
     tiles = get_tile(lat, lon)
 
@@ -53,19 +55,79 @@ def dataflow(
     raw_dir = os.path.join(raw_dir, tiles)
     textfile_path = os.path.join(raw_dir, textfile_name)
     hdf_files = get_modis_hdf_filelist(textfile_path)
+    
 
     # Get fire event dimensions and details
     fire_files, start_date, end_date, bbox_coords = get_event_dimensions(
         hdf_files, processing_dir
     )
 
+    sorted_file_paths = sorted(hdf_files, key=extract_julian_date)
+    output_file = os.path.join(output_dir, create_file_name(sorted_file_paths))
+    if os.path.exists(output_file):
+        return output_file, start_date, end_date, bbox_coords
+    else:
+        print(output_file)
+
     # Process each fire file: crop and resize
-    final_array = []
+    resized_array = []
     for file in fire_files:
         cropped = crop(file, bbox_coords, processing_dir)
-        final_array.append(resize(cropped, output_dir))
-    return final_array, start_date, end_date, bbox_coords
+        resized_array.append(resize(cropped, processing_dir))
 
+    sorted_file_paths = sorted(resized_array, key=extract_julian_date)
+
+    # Open the first file to get metadata
+    with rasterio.open(sorted_file_paths[0]) as src:
+        meta = src.meta.copy()
+        count = src.profile['count']
+
+    # Update meta to reflect the number of layers
+    meta.update(count=len(sorted_file_paths)*count)
+
+
+    # Read and stack all the data
+    with rasterio.open(output_file, 'w', **meta) as dst:
+        for i, path in enumerate(sorted_file_paths):
+            with rasterio.open(path) as src:
+                for j in range(1, count+1):
+                    band_nb = i*(count)+j
+                    print(band_nb, i, j, path)
+                    dst.write_band(band_nb, src.read(j))
+
+    return output_file, start_date, end_date, bbox_coords
+
+
+def date_to_julian(date):
+    """Convert a datetime.date object to a Julian date string 'AYYYYDDD'."""
+    year = date.year
+    start_of_year = datetime(year, 1, 1)
+    julian_day = (date - start_of_year).days + 1
+    julian_date_str = f"A{year}{julian_day:03d}"  # Ensure Julian day is 3 digits
+    return julian_date_str
+
+def julian_to_date(year_and_julian):
+    """Convert a string in the format 'YYYYDDD' to a datetime.date object."""
+    year = int(year_and_julian[:4])
+    julian_day = int(year_and_julian[4:])
+    date = datetime(year, 1, 1) + timedelta(julian_day - 1)
+    return date
+
+def extract_julian_date(filepath):
+    """Extract the Julian date from the filename."""
+    filename = os.path.basename(filepath)
+    # The Julian date part is after the first dot and before the second dot
+    julian_date_str = filename.split('.')[1][1:]
+    return julian_to_date(julian_date_str)
+
+
+def create_file_name(sorted_file_paths):
+    start_date = extract_julian_date(sorted_file_paths[0])
+    end_date = extract_julian_date(sorted_file_paths[-1])
+    filename = os.path.basename(sorted_file_paths[0])
+    split = filename.split('.')
+    filename = f"{split[0]}.{date_to_julian(start_date)}.{date_to_julian(end_date)}.{'.'.join(split[2:-1])}.tif"
+    return filename
 
 def get_modis_hdf_filelist(textfile_path: str):
     """Retrieve the list of MODIS HDF files from a text file.
