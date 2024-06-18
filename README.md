@@ -1,4 +1,11 @@
-# Installation process
+# DS50 Project Sentinel + MODIS + Weather Processing PIPELINE!
+
+This projects provides an easy way to work with satellite data for Data Science. The data is gathered from their respective APIs, converted then standardized, and outputed into .tiff files as well as Tensors for use in models.
+
+Data sources:
+- Sentinel from SentinelHub data for analysis
+- MODIS from NASA data for target labeling
+- Weather data from MeteoStat as feature data
 
 
 ## GDAL Installation
