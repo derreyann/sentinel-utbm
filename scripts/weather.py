@@ -6,6 +6,7 @@ import numpy as np
 import rasterio
 import rioxarray as rxr
 import tqdm
+from scipy.interpolate import griddata
 
 
 def get_weather(
@@ -14,6 +15,7 @@ def get_weather(
     date_end: datetime.date,
     output_dir: str = "../data/modis/final",
     mask_types=["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"],
+    interpolate=True
 ):
     """
     Main function to get weather data, reshape it into masks, and save the masks to files.
@@ -24,7 +26,8 @@ def get_weather(
     - date_end: End date for weather data fetching.
     - output_dir: Directory to save the output mask files.
     - mask_types: Must be str in "'tavg','tmin','tmax','prcp','snow','wdir','wspd','wpgt','pres','tsun'". List of weather features to include in the masks.
-
+    - interpolate: provides interpolation on fetched data, using griddata. Is False by default, can be set to "True".
+    
     Returns:
     - files: list of path to weather data
     """
@@ -38,6 +41,8 @@ def get_weather(
         else:
             data = fetch_weather(input_path, date_start, date_end)
             masks = reshape_weather(input_path, data, mask_types)
+            if(interpolate):
+                masks = interpolate_weather(masks)
             file_paths = save_weather(masks, input_path, output_dir)
             break
     return file_paths
@@ -73,6 +78,7 @@ def fetch_weather(input_path: str, date_start: datetime.date, date_end: datetime
         if not data.empty:
             data["point_id"] = id
             all_data.append(data)
+
     return all_data
 
 
@@ -97,20 +103,21 @@ def reshape_weather(
     # Initialize the dictionary to store masks for each day
     masks = {
         mask_type: np.full(
-            (tiff_file.shape[1], tiff_file.shape[2], tiff_file.shape[0]),
+            (tiff_file.shape[0], tiff_file.shape[1], tiff_file.shape[2]),
             np.nan,
             dtype=float,
         )
         for mask_type in mask_types
     }
 
+    # Populate masks with weather data
     for df in weather_data:
-        # find localisation of data point in base array
+        # Find localization of data point in base array
         id = df["point_id"].iloc[0]
         x = int(id / 128)
         y = id % 128
 
-        # use circular encoding for wdir
+        # Use circular encoding for wdir
         wdir = np.radians(df["wdir"].to_numpy())
         for mask in masks:
             if mask == "sin_wdir":
@@ -119,14 +126,55 @@ def reshape_weather(
                 data = np.cos(wdir)
             else:
                 data = df[mask].to_numpy()
-            masks[mask][x, y] = data
+            masks[mask][:, x, y] = data
 
-    # retranspose from (128, 128, 8) back to (8, 128, 128)
+    # Transpose to (time, x, y)
     transposed_masks = {
-        mask_type: np.transpose(mask, (2, 0, 1)) for mask_type, mask in masks.items()
+        mask_type: np.transpose(mask, (0, 2, 1)) for mask_type, mask in masks.items()
     }
+
     return transposed_masks
 
+
+def interpolate_weather(masks):
+    # Interpolate missing data using nearest neighbor interpolation
+    for mask_type, mask in masks.items():
+        for t in range(mask.shape[0]):
+            x, y = np.indices(mask[t].shape)
+            valid_mask = ~np.isnan(mask[t])
+            points = np.column_stack((x[valid_mask], y[valid_mask]))
+            values = mask[t][valid_mask]
+
+            grid_x, grid_y = np.indices(mask[t].shape)
+            mask_interpolated = griddata(
+                points, values, (grid_x, grid_y), method='linear'
+            )
+            
+            # Ensure mask_interpolated has the correct shape (128, 128)
+            mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
+            
+            # Assign interpolated mask to transposed_masks
+            masks[mask_type][t] = mask_interpolated
+
+    for mask_type, mask in masks.items():
+        for t in range(mask.shape[0]):
+            x, y = np.indices(mask[t].shape)
+            valid_mask = ~np.isnan(mask[t])
+            points = np.column_stack((x[valid_mask], y[valid_mask]))
+            values = mask[t][valid_mask]
+
+            grid_x, grid_y = np.indices(mask[t].shape)
+            mask_interpolated = griddata(
+                points, values, (grid_x, grid_y), method='nearest'
+            )
+            
+            # Ensure mask_interpolated has the correct shape (128, 128)
+            mask_interpolated = np.nan_to_num(mask_interpolated, nan=np.nan)
+            
+            # Assign interpolated mask to transposed_masks
+            masks[mask_type][t] = mask_interpolated
+
+        return masks
 
 def save_weather(
     data: dict, input_path, output_dir: str = "../data/modis/final"

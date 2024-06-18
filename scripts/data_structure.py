@@ -70,6 +70,7 @@ class Event:
         self,
         output_dir: str = "../data/modis/final",
         masks: list[str] = ["tavg", "prcp", "wspd", "sin_wdir", "cos_wdir"],
+        interpolate: bool = True,
     ) -> None:
         """
         Fetch weather data for the event and update the event attributes with the fetched data.
@@ -80,13 +81,14 @@ class Event:
         """
         weather_path_list = []
         date = self.start_date
-        for _ in self.modis_path:
+        for path in self.modis_path:
             weather_files = weather.get_weather(
-                self.modis_path[0],
-                date,
-                date + datetime.timedelta(days=7),
-                output_dir,
-                masks,
+                input_path = path,
+                date_start = date,
+                date_end = date + datetime.timedelta(days=7),
+                output_dir = output_dir,
+                masks = masks,
+                interpolate = interpolate,
             )
             date += datetime.timedelta(days=8)
             weather_path_list.append(weather_files)
