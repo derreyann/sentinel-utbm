@@ -112,12 +112,15 @@ class Event:
         # init storing arrays
         sentinel_path_list = []
         sentinel_resized_path_list = []
+
+        span = self.start_date - self.end_date
+        iterations = abs(int(int(span.days) / 5))
         date = self.start_date
         # Get the tile number to create the img path
         tile = modis.get_tile(self.latitude, self.longitude)
-        # Loop over the number of modis files spanning 8 days
-        for _ in self.modis_path:
-            img_name = f"{tile}_{date.strftime("%Y-%m-%d")}_{(date + datetime.timedelta(days=7)).strftime("%Y-%m-%d")}"
+        # Loop over the number of modis files spanning 5 days
+        for _ in range(iterations):
+            img_name = f"{tile}_{date.strftime("%Y-%m-%d")}_{(date + datetime.timedelta(days=4)).strftime("%Y-%m-%d")}"
             img_path = os.path.join(sentinel_merge_dir, f"{img_name}.tiff")
             if not os.path.exists(img_path):
                 with open("../config.yaml") as file:
@@ -156,34 +159,36 @@ class Event:
         Returns:
         np.ndarray: Tensor containing stacked data from all TIFF files.
         """
-        # Get the number of 8-day periods
-        num_periods = len(self.modis_path)
         full_stack = []
 
+        span = self.start_date - self.end_date
+        iterations = abs(int(int(span.days) / 5))
+
         # Loop over each period
-        for i in range(num_periods):
+        for iter in range(iterations):
             weekly_stack = []
 
             # Dealing with daily data
             to_average_paths = []
-            to_average_paths.append(self.modis_path[i])
-            to_average_paths.extend(self.weather_path[i])
+            to_average_paths.append(self.modis_path)
+            to_average_paths.extend(self.weather_path)
 
             for path in to_average_paths:
                 with rasterio.open(path) as src:
-                    array = src.read()  # Read all bands
+                    array = []
+                    for day in range(1,5):
+                        array.append(src.read((iter*5)+day))  # Read all bands
                     array = np.mean(array, axis=0)
                     weekly_stack.append(array)
 
             # Dealing with Sentinel data
             if self.sentinel_path:
-                with rasterio.open(self.sentinel_resized_path[i]) as src:
+                with rasterio.open(self.sentinel_resized_path[iter]) as src:
                     array = src.read()
                     for band in array:
                         weekly_stack.append(band)
             weekly_stack = np.stack(weekly_stack)
             full_stack.append(weekly_stack)
-            shapes = [array.shape for array in weekly_stack]
         final_stack = np.stack(full_stack)
         return final_stack
 
