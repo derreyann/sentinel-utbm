@@ -13,9 +13,16 @@ Data sources:
 Install GDAL with HDF4 support. This installation process will depend on your system.
 GDAL and the python bidings are needed.
 
+### macOS
+
+Using MacPorts
+``` zsh
+sudo port install gdal +hdf4
+```
+
 ### Arch
 
-Using the AUR depository and yay
+Using the AUR repository and yay
 ``` shell
 yay -S gdal-hdf4 python-gdal-hdf4
 ```
