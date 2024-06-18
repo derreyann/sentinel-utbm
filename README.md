@@ -22,7 +22,7 @@ Most dependencies can be installed using poetry.
 poetry install
 ```
 
-### Rastario
+### Rasterio
 
 After installing GDAL and HDF4 support, you can check if you can open files using
 ``` shell
