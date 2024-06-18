@@ -120,8 +120,8 @@ def get_event_dimensions(hdf_files, processing_dir):
         raise ValueError("No fire founds")
 
     # Extract the first and last date out of that array
-    start_date = date_array[0][0]
-    end_date = date_array[-1][1]
+    start_date = date_array[-1][0]
+    end_date = date_array[0][1]
     bbox_coords = create_bounding_box(coordinates_array)
     return fire_files, start_date, end_date, bbox_coords
 
