@@ -1,4 +1,4 @@
-# DS50 Project Sentinel + MODIS + Weather Processing PIPELINE!
+# DS50 Project: Sentinel + MODIS + Weather Processing Pipeline
 
 This projects provides an easy way to work with satellite data for Data Science. The data is gathered from their respective APIs, converted then standardized, and outputed into .tiff files as well as Tensors for use in models.
 
