@@ -91,6 +91,7 @@ def dataflow(
         current_band = 1
         for i, path in enumerate(sorted_file_paths):
             with rasterio.open(path) as src:
+                # No overlapping data around the new year
                 julian_filename = os.path.basename(path)
                 julian_date_str = julian_filename.split('.')[1][1:]
                 days_left = 365 - int(julian_date_str[4:])
@@ -99,7 +100,6 @@ def dataflow(
                 else:
                     adjust_range = 0
                 for j in range(1, count+1 - adjust_range):  
-                    print(days_left, current_band, i, j)                  
                     dst.write_band(current_band, src.read(j))
                     current_band += 1
 
