@@ -43,7 +43,7 @@ After installing GDAL and HDF4 support, you can check if you can open files usin
 gdalinfo 'file.hdf'
 ```
 
-Once you can successfully read HDF files, you need to install rastario from source for it to include HDF4 support : 
+Once you can successfully read HDF files, you need to install rasterio from source for it to include HDF4 support : 
 ``` shell
 pip install rasterio==1.3.10 --no-binary :all:
 ```
